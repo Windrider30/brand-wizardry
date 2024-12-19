@@ -1,69 +1,141 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
-const getSystemPrompt = (persona: string) => {
-  switch (persona) {
-    case 'dr_brand':
-      return "You are Dr. Brand, an expert in creating comprehensive brand bibles. You specialize in developing foundational brand elements like mission statements, vision statements, and core values. Your responses should be strategic and focused on establishing a strong brand foundation.";
-    case 'juno':
-      return "You are Juno, an expert in market analysis and consumer behavior. You excel at identifying target markets, understanding demographics, and uncovering customer pain points. Your analysis should be data-driven and insightful.";
-    case 'miss_dodge':
-      return "You are Miss Dodge, an expert in brand voice and communication strategy. You help brands develop their unique voice, tone, and messaging framework. Your suggestions should be creative yet consistent with the brand's identity.";
-    case 'demetrius':
-      return "You are Demetrius, an expert in creating detailed buyer and negative personas. You specialize in developing comprehensive customer profiles that help brands understand who they should target and who they shouldn't. Your personas should be detailed and actionable.";
-    default:
-      return "You are a helpful AI assistant specializing in branding and marketing.";
-  }
 };
 
+const ASSISTANT_IDS = {
+  dr_brand: "asst_PfKaHltgJciojiqAunmI7xF6",
+  juno: "asst_dY7WP1Ik9aYwX2hvZeDPTMJR",
+  miss_dodge: "asst_zymFL4PRjWXo3TYddMqf79iO",
+  demetrius: "asst_k2V2izOTUTmaqe7focZXC1ci"
+};
+
+async function createThread() {
+  const response = await fetch('https://api.openai.com/v1/threads', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${openAIApiKey}`,
+      'Content-Type': 'application/json',
+      'OpenAI-Beta': 'assistants=v1'
+    }
+  });
+  return await response.json();
+}
+
+async function addMessage(threadId: string, content: string) {
+  const response = await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${openAIApiKey}`,
+      'Content-Type': 'application/json',
+      'OpenAI-Beta': 'assistants=v1'
+    },
+    body: JSON.stringify({
+      role: 'user',
+      content: content
+    })
+  });
+  return await response.json();
+}
+
+async function runAssistant(threadId: string, assistantId: string) {
+  const response = await fetch(`https://api.openai.com/v1/threads/${threadId}/runs`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${openAIApiKey}`,
+      'Content-Type': 'application/json',
+      'OpenAI-Beta': 'assistants=v1'
+    },
+    body: JSON.stringify({
+      assistant_id: assistantId
+    })
+  });
+  return await response.json();
+}
+
+async function checkRunStatus(threadId: string, runId: string) {
+  const response = await fetch(`https://api.openai.com/v1/threads/${threadId}/runs/${runId}`, {
+    headers: {
+      'Authorization': `Bearer ${openAIApiKey}`,
+      'OpenAI-Beta': 'assistants=v1'
+    }
+  });
+  return await response.json();
+}
+
+async function getMessages(threadId: string) {
+  const response = await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
+    headers: {
+      'Authorization': `Bearer ${openAIApiKey}`,
+      'OpenAI-Beta': 'assistants=v1'
+    }
+  });
+  return await response.json();
+}
+
+async function waitForCompletion(threadId: string, runId: string) {
+  let status = await checkRunStatus(threadId, runId);
+  
+  while (status.status !== 'completed' && status.status !== 'failed') {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    status = await checkRunStatus(threadId, runId);
+    console.log('Current status:', status.status);
+  }
+  
+  if (status.status === 'failed') {
+    throw new Error('Assistant run failed: ' + JSON.stringify(status.last_error));
+  }
+  
+  const messages = await getMessages(threadId);
+  return messages.data[0].content[0].text.value;
+}
+
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { messages, persona } = await req.json()
-    
-    // Add the system message based on the persona
-    const systemMessage = {
-      role: "system",
-      content: getSystemPrompt(persona)
-    };
-    
-    const allMessages = [systemMessage, ...messages];
-
+    const { messages, persona } = await req.json();
     console.log(`Processing request for persona: ${persona}`);
-    console.log('Messages:', JSON.stringify(allMessages));
+    
+    const assistantId = ASSISTANT_IDS[persona];
+    if (!assistantId) {
+      throw new Error(`Invalid persona: ${persona}`);
+    }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: allMessages,
-        temperature: 0.7,
-      }),
-    })
+    // Create a new thread
+    const thread = await createThread();
+    console.log('Thread created:', thread.id);
 
-    const data = await response.json()
-    console.log('OpenAI Response:', JSON.stringify(data));
+    // Add the message to the thread
+    const message = await addMessage(thread.id, messages[messages.length - 1].content);
+    console.log('Message added:', message.id);
 
-    return new Response(JSON.stringify(data), {
+    // Run the assistant
+    const run = await runAssistant(thread.id, assistantId);
+    console.log('Run started:', run.id);
+
+    // Wait for completion and get the response
+    const response = await waitForCompletion(thread.id, run.id);
+    console.log('Got response:', response);
+
+    return new Response(JSON.stringify({ 
+      choices: [{ message: { content: response } }] 
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    });
   } catch (error) {
     console.error('Error in OpenAI function:', error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    });
   }
-})
+});
