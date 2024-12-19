@@ -24,6 +24,11 @@ async function createThread() {
       'OpenAI-Beta': 'assistants=v1'
     }
   });
+  
+  if (!response.ok) {
+    throw new Error(`Failed to create thread: ${await response.text()}`);
+  }
+  
   return await response.json();
 }
 
@@ -40,6 +45,11 @@ async function addMessage(threadId: string, content: string) {
       content: content
     })
   });
+  
+  if (!response.ok) {
+    throw new Error(`Failed to add message: ${await response.text()}`);
+  }
+  
   return await response.json();
 }
 
@@ -55,6 +65,11 @@ async function runAssistant(threadId: string, assistantId: string) {
       assistant_id: assistantId
     })
   });
+  
+  if (!response.ok) {
+    throw new Error(`Failed to run assistant: ${await response.text()}`);
+  }
+  
   return await response.json();
 }
 
@@ -65,6 +80,11 @@ async function checkRunStatus(threadId: string, runId: string) {
       'OpenAI-Beta': 'assistants=v1'
     }
   });
+  
+  if (!response.ok) {
+    throw new Error(`Failed to check run status: ${await response.text()}`);
+  }
+  
   return await response.json();
 }
 
@@ -75,6 +95,11 @@ async function getMessages(threadId: string) {
       'OpenAI-Beta': 'assistants=v1'
     }
   });
+  
+  if (!response.ok) {
+    throw new Error(`Failed to get messages: ${await response.text()}`);
+  }
+  
   return await response.json();
 }
 
