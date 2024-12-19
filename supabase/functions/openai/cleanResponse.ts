@@ -3,9 +3,9 @@ export function cleanResponse(text: string) {
   text = text.replace(/[\u{1F300}-\u{1F9FF}]/gu, '');
   text = text.replace(/#{1,6}\s/g, '');
   
-  // Remove "Basic Brand Bible" completely from the start
-  text = text.replace(/^Basic Brand Bible.*?\n/i, '');
-  text = text.replace(/Basic Brand Bible for.*?\n/i, '');
+  // Remove "Basic Brand Bible" completely from anywhere in the text
+  text = text.replace(/Basic Brand Bible.*?\n/gi, '\n');
+  text = text.replace(/Basic Brand Bible.*/gi, '');
   
   // Remove all introductory phrases
   text = text.replace(/Hello!.*?(?=\n)/s, '');
