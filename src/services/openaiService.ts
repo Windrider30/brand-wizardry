@@ -12,18 +12,11 @@ interface OpenAIResponse {
 
 async function makeOpenAIRequest(messages: any[]) {
   try {
-    // Get the API key from environment
-    const apiKey = process.env.OPENAI_API_KEY;
-    
-    if (!apiKey) {
-      throw new Error("OpenAI API key is not configured");
-    }
-
     const response = await fetch(OPENAI_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
         model: "gpt-4",
