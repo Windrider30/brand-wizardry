@@ -15,6 +15,23 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+function cleanResponse(text: string) {
+  // Remove markdown headers
+  text = text.replace(/###\s*/g, '');
+  
+  // Remove chatbot-style introductions and commentary
+  text = text.replace(/^(👋|📚|🎯|💡).*?\n/gm, '');
+  text = text.replace(/^(Well|Hey|Alright|Now).*?(?=\n)/gm, '');
+  
+  // Clean up extra newlines
+  text = text.replace(/\n{3,}/g, '\n\n');
+  
+  // Trim whitespace
+  text = text.trim();
+  
+  return text;
+}
+
 async function createThread() {
   const response = await fetch('https://api.openai.com/v1/threads', {
     method: 'POST',
@@ -117,7 +134,8 @@ async function waitForCompletion(threadId: string, runId: string) {
   }
   
   const messages = await getMessages(threadId);
-  return messages.data[0].content[0].text.value;
+  const response = messages.data[0].content[0].text.value;
+  return cleanResponse(response);
 }
 
 serve(async (req) => {
