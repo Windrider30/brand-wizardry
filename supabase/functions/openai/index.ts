@@ -21,7 +21,10 @@ function cleanResponse(text: string) {
   
   // Remove chatbot-style introductions and commentary
   text = text.replace(/^(👋|📚|🎯|💡).*?\n/gm, '');
-  text = text.replace(/^(Well|Hey|Alright|Now).*?(?=\n)/gm, '');
+  text = text.replace(/^(Hello|Hi|Hey|Well|Alright|Now|Certainly|Based on|Let's|I'm|Here's).*?\n/gm, '');
+  
+  // Remove any remaining lines that look like chatbot commentary
+  text = text.replace(/^[^A-Z].*?\n/gm, '');
   
   // Clean up extra newlines
   text = text.replace(/\n{3,}/g, '\n\n');
