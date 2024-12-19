@@ -12,11 +12,18 @@ interface OpenAIResponse {
 
 async function makeOpenAIRequest(messages: any[]) {
   try {
+    // Get the API key from environment
+    const apiKey = process.env.OPENAI_API_KEY;
+    
+    if (!apiKey) {
+      throw new Error("OpenAI API key is not configured");
+    }
+
     const response = await fetch(OPENAI_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: "gpt-4",
@@ -26,7 +33,9 @@ async function makeOpenAIRequest(messages: any[]) {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to generate content");
+      const errorData = await response.json();
+      console.error("OpenAI API Error:", errorData);
+      throw new Error(errorData.error?.message || "Failed to generate content");
     }
 
     const data: OpenAIResponse = await response.json();
@@ -35,7 +44,7 @@ async function makeOpenAIRequest(messages: any[]) {
     console.error("OpenAI API Error:", error);
     toast({
       title: "Error",
-      description: "Failed to generate content. Please try again.",
+      description: "Failed to generate content. Please check your API key configuration.",
       variant: "destructive",
     });
     throw error;
