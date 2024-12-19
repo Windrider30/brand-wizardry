@@ -16,6 +16,9 @@ const corsHeaders = {
 };
 
 function cleanResponse(text: string) {
+  // Replace "Basic Brand Bible" with "Brand Bible"
+  text = text.replace(/Basic Brand Bible/g, 'Brand Bible');
+  
   // Remove introductory phrases
   text = text.replace(/Hello!.*?(?=\n)/s, '');
   text = text.replace(/Hi there!.*?(?=\n)/s, '');
