@@ -21,7 +21,7 @@ async function createThread() {
     headers: {
       'Authorization': `Bearer ${openAIApiKey}`,
       'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v1'
+      'OpenAI-Beta': 'assistants=v2'
     }
   });
   
@@ -38,7 +38,7 @@ async function addMessage(threadId: string, content: string) {
     headers: {
       'Authorization': `Bearer ${openAIApiKey}`,
       'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v1'
+      'OpenAI-Beta': 'assistants=v2'
     },
     body: JSON.stringify({
       role: 'user',
@@ -59,7 +59,7 @@ async function runAssistant(threadId: string, assistantId: string) {
     headers: {
       'Authorization': `Bearer ${openAIApiKey}`,
       'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v1'
+      'OpenAI-Beta': 'assistants=v2'
     },
     body: JSON.stringify({
       assistant_id: assistantId
@@ -77,7 +77,7 @@ async function checkRunStatus(threadId: string, runId: string) {
   const response = await fetch(`https://api.openai.com/v1/threads/${threadId}/runs/${runId}`, {
     headers: {
       'Authorization': `Bearer ${openAIApiKey}`,
-      'OpenAI-Beta': 'assistants=v1'
+      'OpenAI-Beta': 'assistants=v2'
     }
   });
   
@@ -92,7 +92,7 @@ async function getMessages(threadId: string) {
   const response = await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
     headers: {
       'Authorization': `Bearer ${openAIApiKey}`,
-      'OpenAI-Beta': 'assistants=v1'
+      'OpenAI-Beta': 'assistants=v2'
     }
   });
   
