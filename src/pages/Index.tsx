@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { BookOpen, MessageSquare, Mail } from "lucide-react";
+import { BookOpen, MessageSquare, Mail, Tag } from "lucide-react";
 
 const Index = () => {
   return (
@@ -11,7 +11,7 @@ const Index = () => {
           Create your brand bible and generate on-brand content using the power of AI
         </p>
         
-        <div className="grid gap-8 md:grid-cols-3 max-w-4xl mx-auto mt-12">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto mt-12">
           <div className="p-6 border rounded-lg">
             <BookOpen className="w-12 h-12 text-primary mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Brand Bible</h2>
@@ -19,6 +19,13 @@ const Index = () => {
             <Link to="/brand-bible">
               <Button variant="outline" className="w-full">Get Started</Button>
             </Link>
+          </div>
+
+          <div className="p-6 border rounded-lg">
+            <Tag className="w-12 h-12 text-primary mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">Product Descriptions</h2>
+            <p className="text-gray-600 mb-4">Generate compelling product content</p>
+            <Button variant="outline" className="w-full">Coming Soon</Button>
           </div>
 
           <div className="p-6 border rounded-lg">
