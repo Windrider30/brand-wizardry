@@ -11,7 +11,7 @@ interface OpenAIResponse {
   }[];
 }
 
-async function makeOpenAIRequest(messages: any[]) {
+async function makeOpenAIRequest(messages: any[], persona: string) {
   try {
     const { data: { session } } = await supabase.auth.getSession();
     
@@ -23,6 +23,7 @@ async function makeOpenAIRequest(messages: any[]) {
       },
       body: JSON.stringify({
         messages: messages,
+        persona: persona
       }),
     });
 
@@ -53,10 +54,6 @@ export async function generateDrBrandContent(brandInfo: {
 }) {
   const messages = [
     {
-      role: "system",
-      content: "You are Dr. Brand, an expert in creating comprehensive brand bibles.",
-    },
-    {
       role: "user",
       content: `I need a brand bible for the following brand:
         Brand Name: ${brandInfo.name}
@@ -72,15 +69,11 @@ export async function generateDrBrandContent(brandInfo: {
     },
   ];
 
-  return makeOpenAIRequest(messages);
+  return makeOpenAIRequest(messages, "dr_brand");
 }
 
 export async function generateJunoContent(previousContent: string) {
   const messages = [
-    {
-      role: "system",
-      content: "You are Juno, an expert in market analysis and consumer behavior.",
-    },
     {
       role: "user",
       content: `Please give me an in-depth target market analysis for the following brand:
@@ -94,15 +87,11 @@ export async function generateJunoContent(previousContent: string) {
     },
   ];
 
-  return makeOpenAIRequest(messages);
+  return makeOpenAIRequest(messages, "juno");
 }
 
 export async function generateMissDodgeContent(previousContent: string) {
   const messages = [
-    {
-      role: "system",
-      content: "You are Miss Dodge, an expert in brand voice and communication strategy.",
-    },
     {
       role: "user",
       content: `I need a better brand voice than what is currently outlined in this brand bible:
@@ -117,15 +106,11 @@ export async function generateMissDodgeContent(previousContent: string) {
     },
   ];
 
-  return makeOpenAIRequest(messages);
+  return makeOpenAIRequest(messages, "miss_dodge");
 }
 
 export async function generateDemetriusContent(previousContent: string) {
   const messages = [
-    {
-      role: "system",
-      content: "You are Demetrius, an expert in creating detailed buyer and negative personas.",
-    },
     {
       role: "user",
       content: `Please create buyer and negative personas for the following brand:
@@ -138,5 +123,5 @@ export async function generateDemetriusContent(previousContent: string) {
     },
   ];
 
-  return makeOpenAIRequest(messages);
+  return makeOpenAIRequest(messages, "demetrius");
 }
