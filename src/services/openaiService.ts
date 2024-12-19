@@ -1,8 +1,6 @@
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-const EDGE_FUNCTION_URL = "https://ofjzlwynchwwnbzlkced.supabase.co/functions/v1/openai";
-
 interface OpenAIResponse {
   choices: {
     message: {
@@ -15,26 +13,23 @@ async function makeOpenAIRequest(messages: any[], persona: string) {
   try {
     const { data: { session } } = await supabase.auth.getSession();
     
-    const response = await fetch(EDGE_FUNCTION_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${session?.access_token}`,
-      },
-      body: JSON.stringify({
-        messages: messages,
-        persona: persona
-      }),
+    if (!session?.access_token) {
+      throw new Error('No session found. Please log in.');
+    }
+    
+    const response = await supabase.functions.invoke('openai', {
+      body: {
+        messages,
+        persona
+      }
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("OpenAI API Error:", errorData);
-      throw new Error(errorData.error?.message || "Failed to generate content");
+    if (response.error) {
+      console.error("OpenAI API Error:", response.error);
+      throw new Error(response.error.message || "Failed to generate content");
     }
 
-    const data: OpenAIResponse = await response.json();
-    return data.choices[0].message.content;
+    return response.data.choices[0].message.content;
   } catch (error) {
     console.error("OpenAI API Error:", error);
     toast({
