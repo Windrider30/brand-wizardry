@@ -3,16 +3,16 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
 const ASSISTANT_IDS = {
   dr_brand: "asst_PfKaHltgJciojiqAunmI7xF6",
   juno: "asst_dY7WP1Ik9aYwX2hvZeDPTMJR",
   miss_dodge: "asst_zymFL4PRjWXo3TYddMqf79iO",
   demetrius: "asst_k2V2izOTUTmaqe7focZXC1ci"
+};
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 async function createThread() {
