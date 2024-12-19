@@ -16,30 +16,28 @@ const corsHeaders = {
 };
 
 function cleanResponse(text: string) {
-  // Replace "Basic Brand Bible" with "Brand Bible"
+  // Remove all emojis
+  text = text.replace(/[\u{1F300}-\u{1F9FF}]/gu, '');
+  
+  // Remove specific introductory phrases for each section
   text = text.replace(/Basic Brand Bible/g, 'Brand Bible');
+  text = text.replace(/Hello!.*?(?=Brand Bible)/s, '');
+  text = text.replace(/Thank you for sharing.*?(?=\n)/s, '');
+  text = text.replace(/Well, roll up your sleeves.*?(?=\n)/s, '');
+  text = text.replace(/Certainly!.*?(?=\n)/s, '');
+  text = text.replace(/Now, dear student.*?(?=\n)/s, '');
   
-  // Remove introductory phrases
-  text = text.replace(/Hello!.*?(?=\n)/s, '');
-  text = text.replace(/Hi there!.*?(?=\n)/s, '');
-  text = text.replace(/I'm.*?(?=\n)/s, '');
-  text = text.replace(/Let's.*?(?=\n)/s, '');
+  // Remove specific concluding phrases
+  text = text.replace(/Next steps could include.*$/s, '');
+  text = text.replace(/By understanding these personas.*$/s, '');
+  text = text.replace(/Remember, thorough customer.*$/s, '');
+  text = text.replace(/Conclusion.*$/s, '');
   
-  // Replace "Basic Brand Bible" with "Brand Bible"
-  text = text.replace(/Basic Brand Bible/, 'Brand Bible');
+  // Remove any lines starting with common chatbot phrases
+  text = text.replace(/^(Now|Well|Alright|Here's|Based on|Let's).*?\n/gm, '');
   
-  // Remove markdown headers while keeping the content
-  text = text.replace(/###\s*/g, '');
-  text = text.replace(/##\s*/g, '');
-  
-  // Remove concluding phrases
-  text = text.replace(/This brand bible establishes.*$/s, '');
-  text = text.replace(/If you need further.*$/s, '');
-  text = text.replace(/Let me know if.*$/s, '');
-  text = text.replace(/Feel free to.*$/s, '');
-  
-  // Remove any remaining chatbot commentary lines
-  text = text.replace(/^(Now,|Well,|Alright,|Here's|Based on).*?\n/gm, '');
+  // Remove quotes with attribution
+  text = text.replace(/["'].*?- [A-Za-z]+["']/g, '');
   
   // Clean up extra newlines and spaces
   text = text.replace(/\n{3,}/g, '\n\n');
