@@ -4,16 +4,18 @@ export function cleanResponse(text: string) {
   text = text.replace(/#{1,6}\s/g, '');
   
   // Remove "Basic Brand Bible" completely from anywhere in the text
-  text = text.replace(/Basic Brand Bible.*?\n/gi, '\n');
+  text = text.replace(/Basic Brand Bible.*?\n/gi, '');
   text = text.replace(/Basic Brand Bible.*/gi, '');
+  text = text.replace(/^Brand Bible.*?\n/gi, '');
   
-  // Remove all introductory phrases
-  text = text.replace(/Hello!.*?(?=\n)/s, '');
+  // Remove all introductory phrases and ChatGPT-style responses
+  text = text.replace(/^(Hello|Hi|Hey|Absolutely|Sure|Great|Perfect|Here's|Let's|Now)!?\s.*?\n/gim, '');
   text = text.replace(/Thank you for sharing.*?(?=\n)/s, '');
   text = text.replace(/Well, roll up your sleeves.*?(?=\n)/s, '');
   text = text.replace(/Certainly!.*?(?=\n)/s, '');
   text = text.replace(/Now, dear student.*?(?=\n)/s, '');
-  text = text.replace(/Absolutely!.*?(?=\n)/s, '');
+  text = text.replace(/I'd be happy to.*?(?=\n)/s, '');
+  text = text.replace(/Let me help you.*?(?=\n)/s, '');
   
   // Remove all conclusion-style endings from each section
   text = text.replace(/Next steps could include.*?(?=\n|$)/gs, '');
