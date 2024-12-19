@@ -16,7 +16,7 @@ async function makeOpenAIRequest(messages: any[]) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
       },
       body: JSON.stringify({
         model: "gpt-4",
@@ -37,7 +37,7 @@ async function makeOpenAIRequest(messages: any[]) {
     console.error("OpenAI API Error:", error);
     toast({
       title: "Error",
-      description: "Failed to generate content. Please check your API key configuration.",
+      description: "Failed to generate content. Please try again later.",
       variant: "destructive",
     });
     throw error;
