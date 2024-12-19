@@ -16,25 +16,30 @@ const corsHeaders = {
 };
 
 function cleanResponse(text: string) {
-  // Remove markdown headers
+  // Remove introductory phrases
+  text = text.replace(/Hello!.*?(?=\n)/s, '');
+  text = text.replace(/Hi there!.*?(?=\n)/s, '');
+  text = text.replace(/I'm.*?(?=\n)/s, '');
+  text = text.replace(/Let's.*?(?=\n)/s, '');
+  
+  // Replace "Basic Brand Bible" with "Brand Bible"
+  text = text.replace(/Basic Brand Bible/, 'Brand Bible');
+  
+  // Remove markdown headers while keeping the content
   text = text.replace(/###\s*/g, '');
+  text = text.replace(/##\s*/g, '');
   
-  // Remove emojis and chatbot-style commentary at the end of sections
-  text = text.replace(/[👋📚🎯💡🔍].*?(?=\n|$)/g, '');
+  // Remove concluding phrases
+  text = text.replace(/This brand bible establishes.*$/s, '');
+  text = text.replace(/If you need further.*$/s, '');
+  text = text.replace(/Let me know if.*$/s, '');
+  text = text.replace(/Feel free to.*$/s, '');
   
-  // Remove common chatbot endings
-  text = text.replace(/Let me know if.*$/gm, '');
-  text = text.replace(/What do you think\?.*$/gm, '');
-  text = text.replace(/Your feedback.*$/gm, '');
-  text = text.replace(/If you require further assistance.*$/gm, '');
-  text = text.replace(/The time for learning.*$/gm, '');
-  text = text.replace(/Keep your vision.*$/gm, '');
-  text = text.replace(/Let's take these insights.*$/gm, '');
+  // Remove any remaining chatbot commentary lines
+  text = text.replace(/^(Now,|Well,|Alright,|Here's|Based on).*?\n/gm, '');
   
-  // Clean up extra newlines
+  // Clean up extra newlines and spaces
   text = text.replace(/\n{3,}/g, '\n\n');
-  
-  // Trim whitespace
   text = text.trim();
   
   return text;
