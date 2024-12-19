@@ -19,12 +19,17 @@ function cleanResponse(text: string) {
   // Remove markdown headers
   text = text.replace(/###\s*/g, '');
   
-  // Remove chatbot-style introductions and commentary
-  text = text.replace(/^(👋|📚|🎯|💡).*?\n/gm, '');
-  text = text.replace(/^(Hello|Hi|Hey|Well|Alright|Now|Certainly|Based on|Let's|I'm|Here's).*?\n/gm, '');
+  // Remove emojis and chatbot-style commentary at the end of sections
+  text = text.replace(/[👋📚🎯💡🔍].*?(?=\n|$)/g, '');
   
-  // Remove any remaining lines that look like chatbot commentary
-  text = text.replace(/^[^A-Z].*?\n/gm, '');
+  // Remove common chatbot endings
+  text = text.replace(/Let me know if.*$/gm, '');
+  text = text.replace(/What do you think\?.*$/gm, '');
+  text = text.replace(/Your feedback.*$/gm, '');
+  text = text.replace(/If you require further assistance.*$/gm, '');
+  text = text.replace(/The time for learning.*$/gm, '');
+  text = text.replace(/Keep your vision.*$/gm, '');
+  text = text.replace(/Let's take these insights.*$/gm, '');
   
   // Clean up extra newlines
   text = text.replace(/\n{3,}/g, '\n\n');
