@@ -15,10 +15,19 @@ export function ApiKeyForm() {
     setIsLoading(true);
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("No user found");
+      }
+
       const { error } = await supabase
         .from("api_configurations")
         .upsert(
-          { api_key: apiKey },
+          { 
+            api_key: apiKey,
+            user_id: user.id 
+          },
           { onConflict: "user_id" }
         );
 
