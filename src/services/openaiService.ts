@@ -1,6 +1,7 @@
 import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
-const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
+const EDGE_FUNCTION_URL = "https://ofjzlwynchwwnbzlkced.supabase.co/functions/v1/openai";
 
 interface OpenAIResponse {
   choices: {
@@ -12,16 +13,16 @@ interface OpenAIResponse {
 
 async function makeOpenAIRequest(messages: any[]) {
   try {
-    const response = await fetch(OPENAI_API_URL, {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    const response = await fetch(EDGE_FUNCTION_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+        "Authorization": `Bearer ${session?.access_token}`,
       },
       body: JSON.stringify({
-        model: "gpt-4",
         messages: messages,
-        temperature: 0.7,
       }),
     });
 
