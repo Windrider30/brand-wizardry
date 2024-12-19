@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { BookOpen, MessageSquare, Mail, Tag } from "lucide-react";
+import { ApiKeyForm } from "@/components/ApiKeyForm";
 
 const Index = () => {
   return (
@@ -11,7 +12,11 @@ const Index = () => {
           Create your brand bible and generate on-brand content using the power of AI
         </p>
         
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto mt-12">
+        <div className="mb-12">
+          <ApiKeyForm />
+        </div>
+        
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
           <div className="p-6 border rounded-lg">
             <BookOpen className="w-12 h-12 text-primary mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Brand Bible</h2>
