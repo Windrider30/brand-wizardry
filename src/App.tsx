@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MainNav } from "./components/MainNav";
 import Index from "./pages/Index";
 import BrandBible from "./pages/BrandBible";
+import ProductDescription from "./pages/ProductDescription";
 import Login from "./pages/Login";
 import { useEffect, useState } from "react";
 import { supabase } from "./integrations/supabase/client";
@@ -55,6 +56,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <BrandBible />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/product-description"
+              element={
+                <ProtectedRoute>
+                  <ProductDescription />
                 </ProtectedRoute>
               }
             />
