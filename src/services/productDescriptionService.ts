@@ -7,22 +7,19 @@ interface ProductInfo {
   features: string;
 }
 
-export async function generateProductDescription(productInfo: ProductInfo) {
+export interface ProductDescriptionResponse {
+  marketingHooks: string[];
+  seoDescriptions: string[];
+  metaDescription: string;
+}
+
+export async function generateProductDescription(productInfo: ProductInfo): Promise<ProductDescriptionResponse | null> {
   try {
     const response = await supabase.functions.invoke('openai', {
       body: {
-        messages: [{
-          role: "user",
-          content: `Using this brand bible as context:
-          ${productInfo.brandBible}
-          
-          Please write a product description for:
-          Product Name: ${productInfo.name}
-          Product Features: ${productInfo.features}
-          
-          The description should align with the brand voice and target audience defined in the brand bible.`
-        }],
-        persona: "solaire"
+        brandBible: productInfo.brandBible,
+        name: productInfo.name,
+        features: productInfo.features,
       }
     });
 
@@ -31,7 +28,33 @@ export async function generateProductDescription(productInfo: ProductInfo) {
       throw new Error(response.error.message);
     }
 
-    return response.data.choices[0].message.content;
+    const content = response.data.content;
+    
+    // Parse the response into structured sections
+    const sections = content.split('\n\n').filter(Boolean);
+    
+    const marketingHooks = sections
+      .find(s => s.includes('Marketing Hooks') || s.includes('SEO Marketing Hooks'))
+      ?.split('\n')
+      .filter(line => line.startsWith('-') || line.startsWith('1.') || line.startsWith('2.') || line.startsWith('3.'))
+      .map(hook => hook.replace(/^[-\d.\s]+/, '').trim()) || [];
+
+    const seoDescriptions = sections
+      .filter(s => s.includes('SEO Description'))
+      .map(desc => desc.split('\n').slice(1).join('\n').trim());
+
+    const metaDescription = sections
+      .find(s => s.includes('Meta Description'))
+      ?.split('\n')
+      .slice(1)
+      .join(' ')
+      .trim() || '';
+
+    return {
+      marketingHooks,
+      seoDescriptions,
+      metaDescription
+    };
   } catch (error) {
     console.error("Error in generateProductDescription:", error);
     toast({
