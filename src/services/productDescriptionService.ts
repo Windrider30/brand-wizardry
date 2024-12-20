@@ -39,9 +39,8 @@ export async function generateProductDescription(productInfo: ProductInfo): Prom
     // Extract the new title from the SEO Title section
     const titleSection = sections.find(s => s.toLowerCase().includes('seo title'));
     const newTitle = titleSection
-      ?.split('\n')
-      .find(line => !line.toLowerCase().includes('seo title'))
-      ?.replace(/^\*\*|\*\*$/g, '')
+      ?.split('\n')[1]  // Take the second line which should contain the first title
+      ?.replace(/^\d+\.\s*["']|["']$/g, '')  // Remove number prefix and quotes
       ?.trim() || '';
     console.log("Extracted title:", newTitle);
 
@@ -55,49 +54,29 @@ export async function generateProductDescription(productInfo: ProductInfo): Prom
     console.log("Extracted hooks:", marketingHooks);
 
     // Extract SEO descriptions
-    const seoDescriptions = [];
-    let currentDescription = [];
-    
-    for (const section of sections) {
-      if (section.toLowerCase().includes('option')) {
-        // Clean up the current description and add it if not empty
-        const cleanDescription = currentDescription
-          .join(' ')
+    const descriptionSection = sections.find(s => s.toLowerCase().includes('description option 1'));
+    const seoDescriptions = sections
+      .filter(section => 
+        section.toLowerCase().includes('description option') && 
+        !section.toLowerCase().includes('meta description')
+      )
+      .map(section => {
+        // Remove the header and clean up the text
+        const lines = section.split('\n').slice(1);
+        return lines.join(' ')
           .replace(/\*\*|\*/g, '')
           .trim();
-        
-        if (cleanDescription) {
-          seoDescriptions.push(cleanDescription);
-        }
-        
-        // Start a new description
-        currentDescription = [section.split('\n').slice(1).join(' ')];
-      } else if (currentDescription.length > 0 && !section.toLowerCase().includes('meta description')) {
-        currentDescription.push(section);
-      }
-    }
-    
-    // Add the last description if there is one
-    if (currentDescription.length > 0) {
-      const cleanDescription = currentDescription
-        .join(' ')
-        .replace(/\*\*|\*/g, '')
-        .trim();
-      if (cleanDescription) {
-        seoDescriptions.push(cleanDescription);
-      }
-    }
-    
+      })
+      .filter(Boolean);
     console.log("Extracted SEO descriptions:", seoDescriptions);
 
     // Extract meta description
     const metaSection = sections.find(s => s.toLowerCase().includes('meta description'));
     const metaDescription = metaSection
       ?.split('\n')
-      .slice(1)
-      .join(' ')
-      .trim()
-      .replace(/\*\*|\*/g, '') || '';
+      .find(line => line.match(/^\d+\.\s*["']/))
+      ?.replace(/^\d+\.\s*["']|["']$/g, '')
+      ?.trim() || '';
     console.log("Extracted meta description:", metaDescription);
 
     return {
