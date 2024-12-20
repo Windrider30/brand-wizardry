@@ -37,12 +37,11 @@ export async function generateProductDescription(productInfo: ProductInfo): Prom
     console.log("Parsed sections:", sections);
     
     // Extract the new title from the SEO Title section
-    const titleSection = sections.find(s => s.toLowerCase().includes('seo optimized title'));
+    const titleSection = sections.find(s => s.toLowerCase().includes('seo title'));
     const newTitle = titleSection
       ?.split('\n')
-      .find(line => line.match(/^\d+\./))
-      ?.replace(/^\d+\.\s*["']|["']$/g, '')
-      ?.trim() || '';
+      .filter(line => line.trim() && !line.toLowerCase().includes('seo title'))
+      .map(line => line.replace(/^\*\*|\*\*$/g, '').trim())[0] || '';
     console.log("Extracted title:", newTitle);
 
     // Extract marketing hooks
