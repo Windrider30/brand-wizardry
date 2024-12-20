@@ -10,25 +10,24 @@ serve(async (req) => {
   try {
     const { brandBible, name, features } = await req.json();
 
-    const prompt = `Solaire, please give me the following for this product. Each element must be unique, so double check your work to avoid repetition:
+    const prompt = `Solaire, please give me the following, each thing must be unique so double check your work before replying to make sure you do not get stuck in a loop as each picture will have the same title with the exception of a number at the end of the title:
 
+Title: ${name}
+SEO Marketing Hooks Make sure to use one of the emotional pain points in the marking hook (Three unique options)
+SEO Descriptions Three unique options, each unique and be between 200 to 300 words and have two paragraphs make sure to use ONLY the title: ${name}
+Meta Description: Must be no longer than 160 characters in length
 Product Title: ${name}
 Product Information: ${features}
 
 Brand Bible Context:
 ${brandBible}
 
-Please provide:
-1. SEO Marketing Hooks (three unique options using emotional pain points)
-2. SEO Descriptions (three unique options, 200-300 words each, two paragraphs per description)
-3. Meta Description (max 160 characters)
-
 Instructions:
 - Use the brand voice from the provided brand bible
-- Address target market pain points subtly, positioning the product as the solution
-- Each SEO description must be two paragraphs and not exceed 300 words
-- Avoid words: "Functional," "Versatile," "Whimsical"
-- Meta description must align with the brand voice
+- Pain Points: Address all five target market pain points with impact but subtly. The product should be the only solution and feel like a reward.
+- SEO Description: Each description must be at least two paragraphs long and should not exceed 300 words.
+- Avoid Words: Avoid using "Functional," "Versatile," "Whimsical," or any variations of these terms.
+- Meta Description: Create a meta description no more than 175 characters long, aligning with the brand voice.
 
 Format the response in clear sections with headers.`;
 
