@@ -1,5 +1,6 @@
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { parseOpenAIResponse } from "@/utils/contentParser";
 
 interface ProductInfo {
   brandBible: string;
@@ -32,62 +33,13 @@ export async function generateProductDescription(productInfo: ProductInfo): Prom
     const content = response.data.content;
     console.log("Raw content from OpenAI:", content);
     
-    // Parse the response into structured sections
-    const sections = content.split('\n\n').filter(Boolean);
-    console.log("Parsed sections:", sections);
+    const parsedContent = parseOpenAIResponse(content);
     
-    // Extract the new title from the SEO Title section
-    const titleSection = sections.find(s => s.toLowerCase().includes('seo title'));
-    const newTitle = titleSection
-      ?.split('\n')
-      .filter(line => line.trim() && !line.toLowerCase().includes('seo title'))
-      .map(line => line.replace(/^\*\*|\*\*$/g, '').trim())[0] || '';
-    console.log("Extracted title:", newTitle);
-
-    // Extract marketing hooks
-    const hooksSection = sections.find(s => s.toLowerCase().includes('marketing hooks'));
-    const marketingHooks = hooksSection
-      ?.split('\n')
-      .filter(line => line.startsWith('-') || line.match(/^\d+\./))
-      .map(hook => hook.replace(/^[-\d.\s]+/, '').trim())
-      .map(hook => hook.replace(/\*\*|\*/g, ''))
-      .map(hook => hook.replace(/^["']|["']$/g, '')) || [];
-    console.log("Extracted hooks:", marketingHooks);
-
-    // Extract SEO descriptions
-    const seoDescriptions = sections
-      .filter(section => 
-        section.toLowerCase().includes('option') && 
-        !section.toLowerCase().includes('meta description')
-      )
-      .map(section => {
-        const lines = section.split('\n')
-          .filter(line => !line.toLowerCase().startsWith('option'))
-          .join(' ');
-        return lines
-          .replace(/\*\*|\*/g, '')
-          .replace(/^#+ /g, '')
-          .trim();
-      })
-      .filter(Boolean);
-    console.log("Extracted SEO descriptions:", seoDescriptions);
-
-    // Extract meta description
-    const metaSection = sections.find(s => s.toLowerCase().includes('meta description'));
-    const metaDescription = metaSection
-      ?.split('\n')
-      .slice(1)
-      .join(' ')
-      .replace(/\*\*|\*/g, '')
-      .replace(/^["']|["']$/g, '')
-      .trim() || '';
-    console.log("Extracted meta description:", metaDescription);
-
     return {
-      marketingHooks,
-      seoDescriptions,
-      metaDescription,
-      newTitle
+      marketingHooks: parsedContent.marketingHooks,
+      seoDescriptions: parsedContent.seoDescriptions,
+      metaDescription: parsedContent.metaDescription,
+      newTitle: parsedContent.title
     };
   } catch (error) {
     console.error("Error in generateProductDescription:", error);
