@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const mercuryAssistantId = 'asst_zahykeJVxsltO7TPB8AYVyCP';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,39 +18,114 @@ serve(async (req) => {
   try {
     const { brandBible, contentType, productUrl, title, description } = await req.json();
 
-    // Create the prompt based on the provided information
-    let productInfo = productUrl 
-      ? `URL: ${productUrl}`
-      : `Title: ${title}\nDescription: ${description}`;
-
-    const prompt = `Using this brand bible:\n${brandBible}\n\nPlease create an email marketing message for this ${contentType}:\n${productInfo}`;
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Create a thread
+    const threadResponse = await fetch('https://api.openai.com/v1/threads', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v2'
+      }
+    });
+
+    if (!threadResponse.ok) {
+      throw new Error(`Failed to create thread: ${await threadResponse.text()}`);
+    }
+
+    const thread = await threadResponse.json();
+    console.log('Thread created:', thread);
+
+    // Create the prompt based on provided information
+    let productInfo = productUrl 
+      ? `URL: ${productUrl}`
+      : `Title: ${title}\nDescription: ${description}`;
+
+    // Add message to thread
+    const messageResponse = await fetch(`https://api.openai.com/v1/threads/${thread.id}/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v2'
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are Mercury, an expert email marketing copywriter. Your task is to create compelling email content that aligns with the provided brand voice and effectively promotes products or collections.'
-          },
-          { role: 'user', content: prompt }
-        ],
-      }),
+        role: 'user',
+        content: `Mercury this is my brand bible:\n${brandBible}\n\nUsing my brand voice and the vibe of my brand I need you to write a marketing email for the following ${contentType}:\n${productInfo}\n\nPlease make sure to hit all of my target market's pain points when writing the email, and phrase it so that the ${contentType} is both the solution as well as a reward itself!`
+      })
     });
 
-    const data = await response.json();
-    console.log('OpenAI Response:', data);
+    if (!messageResponse.ok) {
+      throw new Error(`Failed to add message: ${await messageResponse.text()}`);
+    }
 
-    const generatedContent = data.choices[0].message.content;
+    console.log('Message added to thread');
 
-    return new Response(JSON.stringify({ content: generatedContent }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    // Run the assistant
+    const runResponse = await fetch(`https://api.openai.com/v1/threads/${thread.id}/runs`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v2'
+      },
+      body: JSON.stringify({
+        assistant_id: mercuryAssistantId
+      })
     });
+
+    if (!runResponse.ok) {
+      throw new Error(`Failed to run assistant: ${await runResponse.text()}`);
+    }
+
+    const run = await runResponse.json();
+    console.log('Assistant run started:', run);
+
+    // Poll for completion
+    let runStatus = await fetch(`https://api.openai.com/v1/threads/${thread.id}/runs/${run.id}`, {
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'OpenAI-Beta': 'assistants=v2'
+      }
+    });
+
+    let runStatusData = await runStatus.json();
+    console.log('Initial run status:', runStatusData.status);
+
+    // Poll until completion or failure
+    while (runStatusData.status === 'in_progress' || runStatusData.status === 'queued') {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      runStatus = await fetch(`https://api.openai.com/v1/threads/${thread.id}/runs/${run.id}`, {
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'OpenAI-Beta': 'assistants=v2'
+        }
+      });
+      runStatusData = await runStatus.json();
+      console.log('Updated run status:', runStatusData.status);
+    }
+
+    if (runStatusData.status === 'completed') {
+      // Get the messages
+      const messagesResponse = await fetch(`https://api.openai.com/v1/threads/${thread.id}/messages`, {
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'OpenAI-Beta': 'assistants=v2'
+        }
+      });
+
+      if (!messagesResponse.ok) {
+        throw new Error(`Failed to get messages: ${await messagesResponse.text()}`);
+      }
+
+      const messages = await messagesResponse.json();
+      const generatedContent = messages.data[0].content[0].text.value;
+
+      return new Response(JSON.stringify({ content: generatedContent }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    } else {
+      throw new Error(`Assistant run failed: ${JSON.stringify(runStatusData.last_error)}`);
+    }
   } catch (error) {
     console.error('Error in generate-email-content function:', error);
     return new Response(JSON.stringify({ error: error.message }), {
