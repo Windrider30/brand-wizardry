@@ -9,6 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ad_generations: {
+        Row: {
+          brand_bible: string
+          created_at: string
+          generated_content: string
+          id: string
+          platform: string
+          product_description: string | null
+          product_title: string | null
+          product_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brand_bible: string
+          created_at?: string
+          generated_content: string
+          id?: string
+          platform: string
+          product_description?: string | null
+          product_title?: string | null
+          product_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brand_bible?: string
+          created_at?: string
+          generated_content?: string
+          id?: string
+          platform?: string
+          product_description?: string | null
+          product_title?: string | null
+          product_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       api_configurations: {
         Row: {
           api_key: string

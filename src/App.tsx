@@ -9,6 +9,7 @@ import BrandBible from "./pages/BrandBible";
 import ProductDescription from "./pages/ProductDescription";
 import SocialPosts from "./pages/SocialPosts";
 import EmailContent from "./pages/EmailContent";
+import AdGeneration from "./pages/AdGeneration";
 import Login from "./pages/Login";
 import { useEffect, useState } from "react";
 import { supabase } from "./integrations/supabase/client";
@@ -82,6 +83,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <EmailContent />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ad-generation"
+              element={
+                <ProtectedRoute>
+                  <AdGeneration />
                 </ProtectedRoute>
               }
             />

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { BookOpen, MessageSquare, Mail } from "lucide-react";
+import { BookOpen, MessageSquare, Mail, Target } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function MainNav() {
@@ -22,6 +22,9 @@ export function MainNav() {
           </Link>
           <Link to="/email-content">
             <Button variant="ghost">Email Content</Button>
+          </Link>
+          <Link to="/ad-generation">
+            <Button variant="ghost">Ad Generation</Button>
           </Link>
         </div>
       </div>
