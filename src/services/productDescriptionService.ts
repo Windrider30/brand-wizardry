@@ -37,10 +37,11 @@ export async function generateProductDescription(productInfo: ProductInfo): Prom
     console.log("Parsed sections:", sections);
     
     // Extract the new title from the SEO Title section
-    const titleSection = sections.find(s => s.toLowerCase().includes('seo title'));
+    const titleSection = sections.find(s => s.toLowerCase().includes('seo optimized title'));
     const newTitle = titleSection
-      ?.split('\n')[1]  // Take the second line which should contain the first title
-      ?.replace(/^\d+\.\s*["']|["']$/g, '')  // Remove number prefix and quotes
+      ?.split('\n')
+      .find(line => line.match(/^\d+\./))
+      ?.replace(/^\d+\.\s*["']|["']$/g, '')
       ?.trim() || '';
     console.log("Extracted title:", newTitle);
 
@@ -50,21 +51,23 @@ export async function generateProductDescription(productInfo: ProductInfo): Prom
       ?.split('\n')
       .filter(line => line.startsWith('-') || line.match(/^\d+\./))
       .map(hook => hook.replace(/^[-\d.\s]+/, '').trim())
-      .map(hook => hook.replace(/\*\*|\*/g, '')) || [];
+      .map(hook => hook.replace(/\*\*|\*/g, ''))
+      .map(hook => hook.replace(/^["']|["']$/g, '')) || [];
     console.log("Extracted hooks:", marketingHooks);
 
     // Extract SEO descriptions
-    const descriptionSection = sections.find(s => s.toLowerCase().includes('description option 1'));
     const seoDescriptions = sections
       .filter(section => 
-        section.toLowerCase().includes('description option') && 
+        section.toLowerCase().includes('option') && 
         !section.toLowerCase().includes('meta description')
       )
       .map(section => {
-        // Remove the header and clean up the text
-        const lines = section.split('\n').slice(1);
-        return lines.join(' ')
+        const lines = section.split('\n')
+          .filter(line => !line.toLowerCase().startsWith('option'))
+          .join(' ');
+        return lines
           .replace(/\*\*|\*/g, '')
+          .replace(/^#+ /g, '')
           .trim();
       })
       .filter(Boolean);
@@ -74,9 +77,11 @@ export async function generateProductDescription(productInfo: ProductInfo): Prom
     const metaSection = sections.find(s => s.toLowerCase().includes('meta description'));
     const metaDescription = metaSection
       ?.split('\n')
-      .find(line => line.match(/^\d+\.\s*["']/))
-      ?.replace(/^\d+\.\s*["']|["']$/g, '')
-      ?.trim() || '';
+      .slice(1)
+      .join(' ')
+      .replace(/\*\*|\*/g, '')
+      .replace(/^["']|["']$/g, '')
+      .trim() || '';
     console.log("Extracted meta description:", metaDescription);
 
     return {
