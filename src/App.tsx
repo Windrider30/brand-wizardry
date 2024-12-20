@@ -7,6 +7,7 @@ import { MainNav } from "./components/MainNav";
 import Index from "./pages/Index";
 import BrandBible from "./pages/BrandBible";
 import ProductDescription from "./pages/ProductDescription";
+import SocialPosts from "./pages/SocialPosts";
 import Login from "./pages/Login";
 import { useEffect, useState } from "react";
 import { supabase } from "./integrations/supabase/client";
@@ -64,6 +65,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <ProductDescription />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/social-posts"
+              element={
+                <ProtectedRoute>
+                  <SocialPosts />
                 </ProtectedRoute>
               }
             />

@@ -14,8 +14,11 @@ export function MainNav() {
           <Link to="/brand-bible">
             <Button variant="ghost">Brand Bible</Button>
           </Link>
-          <Link to="/generate">
-            <Button variant="ghost">Generate Content</Button>
+          <Link to="/social-posts">
+            <Button variant="ghost">Social Posts</Button>
+          </Link>
+          <Link to="/product-description">
+            <Button variant="ghost">Product Description</Button>
           </Link>
         </div>
       </div>
