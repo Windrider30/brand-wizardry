@@ -11,7 +11,7 @@ export interface ProductDescriptionResponse {
   marketingHooks: string[];
   seoDescriptions: string[];
   metaDescription: string;
-  newTitle: string; // Added new field
+  newTitle: string;
 }
 
 export async function generateProductDescription(productInfo: ProductInfo): Promise<ProductDescriptionResponse | null> {
