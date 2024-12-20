@@ -26,11 +26,11 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
           <CardTitle>SEO Descriptions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <div className="space-y-8">
             {content.seoDescriptions.map((desc, index) => (
-              <div key={index} className="prose prose-sm">
-                <h3 className="text-sm font-medium mb-2">Version {index + 1}</h3>
-                <div className="whitespace-pre-wrap text-sm">{desc}</div>
+              <div key={index} className="space-y-2">
+                <h3 className="text-sm font-medium">Version {index + 1}</h3>
+                <p className="text-sm whitespace-pre-wrap">{desc}</p>
               </div>
             ))}
           </div>
