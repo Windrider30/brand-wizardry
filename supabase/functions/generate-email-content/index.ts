@@ -9,6 +9,17 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+function cleanupResponse(content: string): string {
+  // Remove Mercury's introductory text
+  content = content.replace(/^Absolutely!.*?testing\.\s*📧\s*/s, '');
+  
+  // Remove Mercury's closing text
+  content = content.replace(/Feel free to modify.*?📧\s*$/s, '');
+  
+  // Trim any extra whitespace
+  return content.trim();
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -118,9 +129,10 @@ serve(async (req) => {
       }
 
       const messages = await messagesResponse.json();
-      const generatedContent = messages.data[0].content[0].text.value;
+      const rawContent = messages.data[0].content[0].text.value;
+      const cleanedContent = cleanupResponse(rawContent);
 
-      return new Response(JSON.stringify({ content: generatedContent }), {
+      return new Response(JSON.stringify({ content: cleanedContent }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     } else {
