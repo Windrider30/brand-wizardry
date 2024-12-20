@@ -43,7 +43,9 @@ const Index = () => {
             <Mail className="w-12 h-12 text-primary mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Email Content</h2>
             <p className="text-gray-600 mb-4">Create compelling email campaigns</p>
-            <Button variant="outline" className="w-full">Coming Soon</Button>
+            <Link to="/email-content">
+              <Button variant="outline" className="w-full">Get Started</Button>
+            </Link>
           </div>
         </div>
       </div>

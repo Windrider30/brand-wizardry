@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import BrandBible from "./pages/BrandBible";
 import ProductDescription from "./pages/ProductDescription";
 import SocialPosts from "./pages/SocialPosts";
+import EmailContent from "./pages/EmailContent";
 import Login from "./pages/Login";
 import { useEffect, useState } from "react";
 import { supabase } from "./integrations/supabase/client";
@@ -73,6 +74,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <SocialPosts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/email-content"
+              element={
+                <ProtectedRoute>
+                  <EmailContent />
                 </ProtectedRoute>
               }
             />

@@ -20,6 +20,9 @@ export function MainNav() {
           <Link to="/product-description">
             <Button variant="ghost">Product Description</Button>
           </Link>
+          <Link to="/email-content">
+            <Button variant="ghost">Email Content</Button>
+          </Link>
         </div>
       </div>
     </nav>
