@@ -11,6 +11,7 @@ export interface ProductDescriptionResponse {
   marketingHooks: string[];
   seoDescriptions: string[];
   metaDescription: string;
+  newTitle: string; // Added new field
 }
 
 export async function generateProductDescription(productInfo: ProductInfo): Promise<ProductDescriptionResponse | null> {
@@ -50,10 +51,19 @@ export async function generateProductDescription(productInfo: ProductInfo): Prom
       .join(' ')
       .trim() || '';
 
+    // Extract the new title
+    const newTitle = sections
+      .find(s => s.includes('New Title:'))
+      ?.split('\n')
+      .slice(1)
+      .join(' ')
+      .trim() || '';
+
     return {
       marketingHooks,
       seoDescriptions,
-      metaDescription
+      metaDescription,
+      newTitle
     };
   } catch (error) {
     console.error("Error in generateProductDescription:", error);

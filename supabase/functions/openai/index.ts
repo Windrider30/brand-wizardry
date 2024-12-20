@@ -10,24 +10,24 @@ serve(async (req) => {
   try {
     const { brandBible, name, features } = await req.json();
 
-    const prompt = `Solaire, please give me the following, each thing must be unique so double check your work before replying to make sure you do not get stuck in a loop as each picture will have the same title with the exception of a number at the end of the title:
+    const prompt = `Solaire,please give me a better SEO title than what I currently have make sure that the title is between 60 to no more than 70 characters in lenght, please be sure to use my brand voice when making the title
 
 Title: ${name}
-SEO Marketing Hooks Make sure to use one of the emotional pain points in the marking hook (Three unique options)
+SEO Marketing Hooks Make sure to use one of the emotional pain points in the marking hook(Three unique options)
 SEO Descriptions Three unique options, each unique and be between 200 to 300 words and have two paragraphs make sure to use ONLY the title: ${name}
-Meta Description: Must be no longer than 160 characters in length
+Meta Description: Must be no longer than 160 characters in length 
 Product Title: ${name}
 Product Information: ${features}
 
+Instructions:
+Use the brand voice from the provided brand bible
+Pain Points: Address all five target market pain points with impact but subtly. The product should be the only solution and feel like a reward.
+SEO Description: Each description must be at least two paragraphs long and should not exceed 300 words.
+Avoid Words: Avoid using "Functional," "Versatile," "Whimsical," or any variations of these terms.
+Meta Description: Create a meta description no more than 175 characters long, aligning with the brand voice.
+
 Brand Bible Context:
 ${brandBible}
-
-Instructions:
-- Use the brand voice from the provided brand bible
-- Pain Points: Address all five target market pain points with impact but subtly. The product should be the only solution and feel like a reward.
-- SEO Description: Each description must be at least two paragraphs long and should not exceed 300 words.
-- Avoid Words: Avoid using "Functional," "Versatile," "Whimsical," or any variations of these terms.
-- Meta Description: Create a meta description no more than 175 characters long, aligning with the brand voice.
 
 Format the response in clear sections with headers.`;
 

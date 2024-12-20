@@ -8,6 +8,17 @@ interface GeneratedContentProps {
 export function GeneratedContent({ content }: GeneratedContentProps) {
   return (
     <div className="space-y-8">
+      {content.newTitle && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Suggested Title</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-sm whitespace-pre-wrap">{content.newTitle}</div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>Marketing Hooks</CardTitle>
