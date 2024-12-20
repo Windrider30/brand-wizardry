@@ -16,7 +16,7 @@ serve(async (req) => {
   }
 
   try {
-    const { brandBible, platform, productUrl, productTitle, productDescription } = await req.json();
+    const { brandBible, platform, adType, productUrl, productTitle, productDescription } = await req.json();
 
     // Create a thread
     const threadResponse = await fetch('https://api.openai.com/v1/threads', {
@@ -36,7 +36,24 @@ serve(async (req) => {
       `Product URL: ${productUrl}` : 
       `Product Title: ${productTitle}\nProduct Description: ${productDescription}`;
 
-    const messageContent = `AdSavant I need a ${platform} ad. Please use my brand voice when writing the ad. The ad will be for the following product:\n\n${productInfo}\n\nHere is my brand bible for reference:\n${brandBible}`;
+    const messageContent = `AdSavant i need a ${platform} ad (${adType}) for the following product: ${productInfo}
+
+Please make sure to use my brand voice and keep the vibe of my brand when making the ad. Here is my brand bible for reference:
+${brandBible}
+
+Please provide:
+1. Five primary text options (max 125 characters each) designed to engage and compel
+2. Five headlines (max 225 characters each) focused on capturing interest quickly
+3. Five ad descriptions that:
+   - Follow marketing best practices
+   - Address at least two target market pain points (one emotional, one practical)
+
+Please format the response in JSON with the following structure:
+{
+  "primaryTexts": ["text1", "text2", "text3", "text4", "text5"],
+  "headlines": ["headline1", "headline2", "headline3", "headline4", "headline5"],
+  "descriptions": ["desc1", "desc2", "desc3", "desc4", "desc5"]
+}`;
 
     const messageResponse = await fetch(`https://api.openai.com/v1/threads/${thread.id}/messages`, {
       method: 'POST',
@@ -106,7 +123,10 @@ serve(async (req) => {
     const messages = await messagesResponse.json();
     const generatedContent = messages.data[0].content[0].text.value;
 
-    return new Response(JSON.stringify({ content: generatedContent }), {
+    // Parse the JSON response
+    const parsedContent = JSON.parse(generatedContent);
+
+    return new Response(JSON.stringify({ content: parsedContent }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {

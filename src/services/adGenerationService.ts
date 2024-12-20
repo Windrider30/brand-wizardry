@@ -10,24 +10,20 @@ interface GenerateAdParams {
   productDescription?: string;
 }
 
-export async function generateAd({
-  brandBible,
-  platform,
-  adType,
-  productUrl,
-  productTitle,
-  productDescription,
-}: GenerateAdParams): Promise<string> {
+interface GeneratedContent {
+  primaryTexts: string[];
+  headlines: string[];
+  descriptions: string[];
+}
+
+interface GenerateAdResponse {
+  content: GeneratedContent;
+}
+
+export async function generateAd(params: GenerateAdParams): Promise<GenerateAdResponse> {
   try {
     const { data, error } = await supabase.functions.invoke('generate-ad', {
-      body: {
-        brandBible,
-        platform,
-        adType,
-        productUrl,
-        productTitle,
-        productDescription,
-      },
+      body: params,
     });
 
     if (error) {
@@ -35,7 +31,7 @@ export async function generateAd({
       throw new Error(error.message);
     }
 
-    return data.content;
+    return data;
   } catch (error) {
     console.error('Error in generateAd:', error);
     toast({

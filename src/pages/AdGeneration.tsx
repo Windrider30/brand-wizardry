@@ -4,10 +4,16 @@ import { AdGenerationForm } from "@/components/ad-generation/AdGenerationForm";
 import { GeneratedContent } from "@/components/ad-generation/GeneratedContent";
 import { generateAd } from "@/services/adGenerationService";
 
+interface GeneratedContent {
+  primaryTexts: string[];
+  headlines: string[];
+  descriptions: string[];
+}
+
 export default function AdGeneration() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [generatedContent, setGeneratedContent] = useState("");
+  const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
   const [formData, setFormData] = useState({
     brandBible: "",
     platform: "facebook",
@@ -50,8 +56,8 @@ export default function AdGeneration() {
     setIsLoading(true);
     
     try {
-      const content = await generateAd(formData);
-      setGeneratedContent(content);
+      const response = await generateAd(formData);
+      setGeneratedContent(response.content);
       toast({
         title: "Ad Generated",
         description: "Your ad content has been generated successfully!",
