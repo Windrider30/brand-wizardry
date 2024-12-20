@@ -30,38 +30,48 @@ export async function generateProductDescription(productInfo: ProductInfo): Prom
     }
 
     const content = response.data.content;
+    console.log("Raw content from OpenAI:", content); // Debug log
     
     // Parse the response into structured sections
     const sections = content.split('\n\n').filter(Boolean);
+    console.log("Parsed sections:", sections); // Debug log
     
     // Extract the new title
-    const newTitle = sections
-      .find(s => s.toLowerCase().includes('title:'))
+    const titleSection = sections.find(s => s.toLowerCase().includes('title:'));
+    const newTitle = titleSection
       ?.split('\n')[0]
       ?.replace(/^title:\s*/i, '')
       ?.trim() || '';
+    console.log("Extracted title:", newTitle); // Debug log
 
-    const marketingHooks = sections
-      .find(s => s.toLowerCase().includes('marketing hooks'))
+    // Extract marketing hooks
+    const hooksSection = sections.find(s => s.toLowerCase().includes('marketing hooks'));
+    const marketingHooks = hooksSection
       ?.split('\n')
       .filter(line => line.startsWith('-') || line.startsWith('1.') || line.startsWith('2.') || line.startsWith('3.'))
       .map(hook => hook.replace(/^[-\d.\s]+/, '').trim())
       .map(hook => hook.replace(/\*\*/g, '')) || [];
+    console.log("Extracted hooks:", marketingHooks); // Debug log
 
+    // Extract SEO descriptions
     const seoDescriptions = sections
       .filter(s => s.toLowerCase().includes('seo description'))
       .map(desc => {
         const lines = desc.split('\n').slice(1);
-        return lines.join('\n').trim().replace(/\*\*/g, '');
-      });
+        return lines.join(' ').trim().replace(/\*\*/g, '');
+      })
+      .filter(Boolean);
+    console.log("Extracted SEO descriptions:", seoDescriptions); // Debug log
 
-    const metaDescription = sections
-      .find(s => s.toLowerCase().includes('meta description'))
+    // Extract meta description
+    const metaSection = sections.find(s => s.toLowerCase().includes('meta description'));
+    const metaDescription = metaSection
       ?.split('\n')
       .slice(1)
       .join(' ')
       .trim()
       .replace(/\*\*/g, '') || '';
+    console.log("Extracted meta description:", metaDescription); // Debug log
 
     return {
       marketingHooks,
