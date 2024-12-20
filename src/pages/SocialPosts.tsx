@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { SocialPostsForm } from "@/components/social-posts/SocialPostsForm";
+import { GeneratedContent } from "@/components/social-posts/GeneratedContent";
+import { generateSocialPost } from "@/services/socialPostsService";
 
 export default function SocialPosts() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [generatedContent, setGeneratedContent] = useState("");
   const [formData, setFormData] = useState({
     brandBible: "",
     platform: "",
@@ -46,12 +49,14 @@ export default function SocialPosts() {
     setIsLoading(true);
     
     try {
-      // We'll implement the generation logic after getting Dennis's prompt
+      const content = await generateSocialPost(formData);
+      setGeneratedContent(content);
       toast({
         title: "Content Generated",
         description: "Your social media content has been generated successfully!",
       });
     } catch (error) {
+      console.error('Error generating content:', error);
       toast({
         title: "Error",
         description: "Failed to generate social media content. Please try again.",
@@ -78,7 +83,9 @@ export default function SocialPosts() {
           onSubmit={handleSubmit}
           isLoading={isLoading}
         />
-        {/* We'll add the generated content component later */}
+        {generatedContent && (
+          <GeneratedContent content={generatedContent} platform={formData.platform} />
+        )}
       </div>
     </div>
   );
