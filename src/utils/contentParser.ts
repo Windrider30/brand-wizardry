@@ -39,45 +39,43 @@ function extractMarketingHooks(sections: string[]): string[] {
 }
 
 function extractSEODescriptions(sections: string[]): string[] {
-  // Find the section that starts with "SEO Descriptions"
+  // Find the SEO Descriptions section
   const descriptionSectionIndex = sections.findIndex(s => 
-    s.toLowerCase().includes('seo descriptions')
+    s.toLowerCase().includes('seo descriptions') && !s.toLowerCase().includes('meta')
   );
   
   if (descriptionSectionIndex === -1) return [];
   
-  // Get all sections after "SEO Descriptions" that contain "Description Option" or start with "Option"
   const descriptions: string[] = [];
-  let currentDescription = '';
   
+  // Start from the section after "SEO Descriptions"
   for (let i = descriptionSectionIndex + 1; i < sections.length; i++) {
     const section = sections[i];
     
     // Stop if we hit another major section
-    if (section.toLowerCase().includes('meta description')) break;
+    if (section.toLowerCase().includes('meta description') || 
+        section.toLowerCase().includes('feel free to choose')) {
+      break;
+    }
     
-    // If this section contains a description option
-    if (section.toLowerCase().includes('description option') || 
-        section.toLowerCase().startsWith('option')) {
-      if (currentDescription) {
-        descriptions.push(currentDescription.trim());
-        currentDescription = '';
-      }
-      // Remove the "Description Option X" or "Option X" header and clean the text
-      currentDescription = section
-        .replace(/###?\s*Description Option \d+/i, '')
-        .replace(/Option \d+/i, '')
+    // Skip sections that contain SEO Title Options
+    if (section.toLowerCase().includes('seo title')) {
+      continue;
+    }
+    
+    // Only process sections that contain actual descriptions
+    if (section.toLowerCase().includes('option') || 
+        section.match(/^###?\s*Option/i)) {
+      const cleanedDescription = section
+        .replace(/^###?\s*Option \d+/i, '')
+        .replace(/^Option \d+:?/i, '')
         .replace(/\*\*|\*/g, '')
         .trim();
-    } else if (currentDescription) {
-      // Append to current description if we're in the middle of one
-      currentDescription += ' ' + section.replace(/\*\*|\*/g, '').trim();
+      
+      if (cleanedDescription) {
+        descriptions.push(cleanedDescription);
+      }
     }
-  }
-  
-  // Add the last description if there is one
-  if (currentDescription) {
-    descriptions.push(currentDescription.trim());
   }
   
   return descriptions;
