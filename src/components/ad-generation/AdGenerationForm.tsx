@@ -1,11 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BrandBibleInput } from "./BrandBibleInput";
+import { PlatformSelector } from "./PlatformSelector";
+import { AdTypeSelector } from "./AdTypeSelector";
+import { ProductInfoInputs } from "./ProductInfoInputs";
 
 interface FormData {
   brandBible: string;
@@ -39,89 +38,29 @@ export function AdGenerationForm({
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="brandBible">Your Brand Bible</Label>
-            <Textarea
-              id="brandBible"
-              placeholder="Paste your brand bible content here"
-              className="min-h-[200px]"
-              value={formData.brandBible}
-              onChange={(e) => setFormData({ ...formData, brandBible: e.target.value })}
-              required
-            />
-          </div>
+          <BrandBibleInput
+            value={formData.brandBible}
+            onChange={(value) => setFormData({ ...formData, brandBible: value })}
+          />
 
-          <div className="space-y-2">
-            <Label>Platform</Label>
-            <RadioGroup
-              value={formData.platform}
-              onValueChange={(value) => setFormData({ ...formData, platform: value })}
-              className="flex flex-col space-y-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="facebook" id="facebook" />
-                <Label htmlFor="facebook">Facebook</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="instagram" id="instagram" />
-                <Label htmlFor="instagram">Instagram</Label>
-              </div>
-            </RadioGroup>
-          </div>
+          <PlatformSelector
+            value={formData.platform}
+            onChange={(value) => setFormData({ ...formData, platform: value })}
+          />
 
-          <div className="space-y-2">
-            <Label>Ad Type</Label>
-            <Select 
-              value={formData.adType} 
-              onValueChange={(value) => setFormData({ ...formData, adType: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select ad type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="awareness">Awareness Ads</SelectItem>
-                <SelectItem value="traffic">Traffic Ads</SelectItem>
-                <SelectItem value="engagement">Engagement Ads</SelectItem>
-                <SelectItem value="lead-generation">Lead Generation Ads</SelectItem>
-                <SelectItem value="app-promotion">App Promotion Ads</SelectItem>
-                <SelectItem value="sales">Sales Ads</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <AdTypeSelector
+            value={formData.adType}
+            onChange={(value) => setFormData({ ...formData, adType: value })}
+          />
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="productUrl">Product URL (Optional)</Label>
-              <Input
-                id="productUrl"
-                placeholder="Enter the product URL"
-                value={formData.productUrl}
-                onChange={(e) => setFormData({ ...formData, productUrl: e.target.value })}
-              />
-            </div>
-
-            <div className="text-center text-sm text-gray-500">OR</div>
-
-            <div className="space-y-2">
-              <Label htmlFor="productTitle">Product Title</Label>
-              <Input
-                id="productTitle"
-                placeholder="Enter the product title"
-                value={formData.productTitle}
-                onChange={(e) => setFormData({ ...formData, productTitle: e.target.value })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="productDescription">Product Description</Label>
-              <Textarea
-                id="productDescription"
-                placeholder="Enter the product description"
-                value={formData.productDescription}
-                onChange={(e) => setFormData({ ...formData, productDescription: e.target.value })}
-              />
-            </div>
-          </div>
+          <ProductInfoInputs
+            productUrl={formData.productUrl}
+            productTitle={formData.productTitle}
+            productDescription={formData.productDescription}
+            onProductUrlChange={(value) => setFormData({ ...formData, productUrl: value })}
+            onProductTitleChange={(value) => setFormData({ ...formData, productTitle: value })}
+            onProductDescriptionChange={(value) => setFormData({ ...formData, productDescription: value })}
+          />
 
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
