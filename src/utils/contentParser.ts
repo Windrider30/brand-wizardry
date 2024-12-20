@@ -19,10 +19,13 @@ export function parseOpenAIResponse(content: string): ParsedContent {
 
 function extractTitle(sections: string[]): string {
   const titleSection = sections.find(s => s.toLowerCase().includes('seo title'));
-  return titleSection
-    ?.split('\n')
+  if (!titleSection) return '';
+  
+  const lines = titleSection.split('\n')
     .filter(line => line.trim() && !line.toLowerCase().includes('seo title'))
-    .map(line => line.replace(/^\*\*|\*\*$/g, '').trim())[0] || '';
+    .map(line => line.replace(/^\d+\.\s*"|"$/g, '').trim());
+  
+  return lines[0] || '';
 }
 
 function extractMarketingHooks(sections: string[]): string[] {
@@ -36,21 +39,48 @@ function extractMarketingHooks(sections: string[]): string[] {
 }
 
 function extractSEODescriptions(sections: string[]): string[] {
-  return sections
-    .filter(section => 
-      section.toLowerCase().includes('option') && 
-      !section.toLowerCase().includes('meta description')
-    )
-    .map(section => {
-      const lines = section.split('\n')
-        .filter(line => !line.toLowerCase().startsWith('option'))
-        .join(' ');
-      return lines
+  // Find the section that starts with "SEO Descriptions"
+  const descriptionSectionIndex = sections.findIndex(s => 
+    s.toLowerCase().includes('seo descriptions')
+  );
+  
+  if (descriptionSectionIndex === -1) return [];
+  
+  // Get all sections after "SEO Descriptions" that contain "Description Option" or start with "Option"
+  const descriptions: string[] = [];
+  let currentDescription = '';
+  
+  for (let i = descriptionSectionIndex + 1; i < sections.length; i++) {
+    const section = sections[i];
+    
+    // Stop if we hit another major section
+    if (section.toLowerCase().includes('meta description')) break;
+    
+    // If this section contains a description option
+    if (section.toLowerCase().includes('description option') || 
+        section.toLowerCase().startsWith('option')) {
+      if (currentDescription) {
+        descriptions.push(currentDescription.trim());
+        currentDescription = '';
+      }
+      // Remove the "Description Option X" or "Option X" header and clean the text
+      currentDescription = section
+        .replace(/###?\s*Description Option \d+/i, '')
+        .replace(/Option \d+/i, '')
         .replace(/\*\*|\*/g, '')
-        .replace(/^#+ /g, '')
         .trim();
-    })
-    .filter(Boolean);
+    } else if (currentDescription) {
+      // Append to current description if we're in the middle of one
+      currentDescription += ' ' + section.replace(/\*\*|\*/g, '').trim();
+    }
+  }
+  
+  // Add the last description if there is one
+  if (currentDescription) {
+    descriptions.push(currentDescription.trim());
+  }
+  
+  return descriptions;
 }
 
 function extractMetaDescription(sections: string[]): string {
