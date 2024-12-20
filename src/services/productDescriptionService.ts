@@ -34,30 +34,34 @@ export async function generateProductDescription(productInfo: ProductInfo): Prom
     // Parse the response into structured sections
     const sections = content.split('\n\n').filter(Boolean);
     
-    const marketingHooks = sections
-      .find(s => s.includes('Marketing Hooks') || s.includes('SEO Marketing Hooks'))
-      ?.split('\n')
-      .filter(line => line.startsWith('-') || line.startsWith('1.') || line.startsWith('2.') || line.startsWith('3.'))
-      .map(hook => hook.replace(/^[-\d.\s]+/, '').trim()) || [];
-
-    const seoDescriptions = sections
-      .filter(s => s.includes('SEO Description'))
-      .map(desc => desc.split('\n').slice(1).join('\n').trim());
-
-    const metaDescription = sections
-      .find(s => s.includes('Meta Description'))
-      ?.split('\n')
-      .slice(1)
-      .join(' ')
-      .trim() || '';
-
     // Extract the new title
     const newTitle = sections
-      .find(s => s.includes('New Title:'))
+      .find(s => s.toLowerCase().includes('title:'))
+      ?.split('\n')[0]
+      ?.replace(/^title:\s*/i, '')
+      ?.trim() || '';
+
+    const marketingHooks = sections
+      .find(s => s.toLowerCase().includes('marketing hooks'))
+      ?.split('\n')
+      .filter(line => line.startsWith('-') || line.startsWith('1.') || line.startsWith('2.') || line.startsWith('3.'))
+      .map(hook => hook.replace(/^[-\d.\s]+/, '').trim())
+      .map(hook => hook.replace(/\*\*/g, '')) || [];
+
+    const seoDescriptions = sections
+      .filter(s => s.toLowerCase().includes('seo description'))
+      .map(desc => {
+        const lines = desc.split('\n').slice(1);
+        return lines.join('\n').trim().replace(/\*\*/g, '');
+      });
+
+    const metaDescription = sections
+      .find(s => s.toLowerCase().includes('meta description'))
       ?.split('\n')
       .slice(1)
       .join(' ')
-      .trim() || '';
+      .trim()
+      .replace(/\*\*/g, '') || '';
 
     return {
       marketingHooks,

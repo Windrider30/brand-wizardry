@@ -8,16 +8,14 @@ interface GeneratedContentProps {
 export function GeneratedContent({ content }: GeneratedContentProps) {
   return (
     <div className="space-y-8">
-      {content.newTitle && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Suggested Title</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-sm whitespace-pre-wrap">{content.newTitle}</div>
-          </CardContent>
-        </Card>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle>Suggested Title</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-sm">{content.newTitle}</div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -41,7 +39,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
             {content.seoDescriptions.map((desc, index) => (
               <div key={index} className="space-y-2">
                 <h3 className="text-sm font-medium">Version {index + 1}</h3>
-                <p className="text-sm whitespace-pre-wrap">{desc}</p>
+                <p className="text-sm">{desc}</p>
               </div>
             ))}
           </div>
@@ -53,7 +51,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
           <CardTitle>Meta Description</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-sm whitespace-pre-wrap">{content.metaDescription}</div>
+          <div className="text-sm">{content.metaDescription}</div>
         </CardContent>
       </Card>
     </div>
