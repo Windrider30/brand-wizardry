@@ -30,38 +30,65 @@ export async function generateProductDescription(productInfo: ProductInfo): Prom
     }
 
     const content = response.data.content;
-    console.log("Raw content from OpenAI:", content); // Debug log
+    console.log("Raw content from OpenAI:", content);
     
     // Parse the response into structured sections
     const sections = content.split('\n\n').filter(Boolean);
-    console.log("Parsed sections:", sections); // Debug log
+    console.log("Parsed sections:", sections);
     
-    // Extract the new title
-    const titleSection = sections.find(s => s.toLowerCase().includes('title:'));
+    // Extract the new title from the SEO Title section
+    const titleSection = sections.find(s => s.toLowerCase().includes('seo title'));
     const newTitle = titleSection
-      ?.split('\n')[0]
-      ?.replace(/^title:\s*/i, '')
+      ?.split('\n')
+      .find(line => !line.toLowerCase().includes('seo title'))
+      ?.replace(/^\*\*|\*\*$/g, '')
       ?.trim() || '';
-    console.log("Extracted title:", newTitle); // Debug log
+    console.log("Extracted title:", newTitle);
 
     // Extract marketing hooks
     const hooksSection = sections.find(s => s.toLowerCase().includes('marketing hooks'));
     const marketingHooks = hooksSection
       ?.split('\n')
-      .filter(line => line.startsWith('-') || line.startsWith('1.') || line.startsWith('2.') || line.startsWith('3.'))
+      .filter(line => line.startsWith('-') || line.match(/^\d+\./))
       .map(hook => hook.replace(/^[-\d.\s]+/, '').trim())
-      .map(hook => hook.replace(/\*\*/g, '')) || [];
-    console.log("Extracted hooks:", marketingHooks); // Debug log
+      .map(hook => hook.replace(/\*\*|\*/g, '')) || [];
+    console.log("Extracted hooks:", marketingHooks);
 
     // Extract SEO descriptions
-    const seoDescriptions = sections
-      .filter(s => s.toLowerCase().includes('seo description'))
-      .map(desc => {
-        const lines = desc.split('\n').slice(1);
-        return lines.join(' ').trim().replace(/\*\*/g, '');
-      })
-      .filter(Boolean);
-    console.log("Extracted SEO descriptions:", seoDescriptions); // Debug log
+    const seoDescriptions = [];
+    let currentDescription = [];
+    
+    for (const section of sections) {
+      if (section.toLowerCase().includes('option')) {
+        // Clean up the current description and add it if not empty
+        const cleanDescription = currentDescription
+          .join(' ')
+          .replace(/\*\*|\*/g, '')
+          .trim();
+        
+        if (cleanDescription) {
+          seoDescriptions.push(cleanDescription);
+        }
+        
+        // Start a new description
+        currentDescription = [section.split('\n').slice(1).join(' ')];
+      } else if (currentDescription.length > 0 && !section.toLowerCase().includes('meta description')) {
+        currentDescription.push(section);
+      }
+    }
+    
+    // Add the last description if there is one
+    if (currentDescription.length > 0) {
+      const cleanDescription = currentDescription
+        .join(' ')
+        .replace(/\*\*|\*/g, '')
+        .trim();
+      if (cleanDescription) {
+        seoDescriptions.push(cleanDescription);
+      }
+    }
+    
+    console.log("Extracted SEO descriptions:", seoDescriptions);
 
     // Extract meta description
     const metaSection = sections.find(s => s.toLowerCase().includes('meta description'));
@@ -70,8 +97,8 @@ export async function generateProductDescription(productInfo: ProductInfo): Prom
       .slice(1)
       .join(' ')
       .trim()
-      .replace(/\*\*/g, '') || '';
-    console.log("Extracted meta description:", metaDescription); // Debug log
+      .replace(/\*\*|\*/g, '') || '';
+    console.log("Extracted meta description:", metaDescription);
 
     return {
       marketingHooks,
