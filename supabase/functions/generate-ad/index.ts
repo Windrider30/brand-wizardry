@@ -48,7 +48,7 @@ Please provide:
    - Follow marketing best practices
    - Address at least two target market pain points (one emotional, one practical)
 
-Please format the response in JSON with the following structure:
+Please format the response in a clean JSON structure like this, without any markdown formatting:
 {
   "primaryTexts": ["text1", "text2", "text3", "text4", "text5"],
   "headlines": ["headline1", "headline2", "headline3", "headline4", "headline5"],
@@ -121,10 +121,27 @@ Please format the response in JSON with the following structure:
     });
     
     const messages = await messagesResponse.json();
-    const generatedContent = messages.data[0].content[0].text.value;
-
-    // Parse the JSON response
-    const parsedContent = JSON.parse(generatedContent);
+    const assistantMessage = messages.data[0].content[0].text.value;
+    
+    // Extract JSON from the response
+    let parsedContent;
+    try {
+      // Try to find JSON structure in the response
+      const jsonMatch = assistantMessage.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        parsedContent = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('No valid JSON found in response');
+      }
+    } catch (error) {
+      console.error('Error parsing JSON from assistant response:', error);
+      // Fallback structure if parsing fails
+      parsedContent = {
+        primaryTexts: ["Failed to generate primary texts"],
+        headlines: ["Failed to generate headlines"],
+        descriptions: ["Failed to generate descriptions"]
+      };
+    }
 
     return new Response(JSON.stringify({ content: parsedContent }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
