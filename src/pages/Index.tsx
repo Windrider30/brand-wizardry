@@ -34,7 +34,9 @@ const Index = () => {
             <MessageSquare className="w-12 h-12 text-primary mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Social Posts</h2>
             <p className="text-gray-600 mb-4">Generate content for Facebook, Instagram, and Pinterest</p>
-            <Button variant="outline" className="w-full">Coming Soon</Button>
+            <Link to="/social-posts">
+              <Button variant="outline" className="w-full">Get Started</Button>
+            </Link>
           </div>
 
           <div className="p-6 border rounded-lg">
