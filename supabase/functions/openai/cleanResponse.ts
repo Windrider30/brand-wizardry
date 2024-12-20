@@ -24,6 +24,7 @@ export function cleanResponse(text: string) {
   text = text.replace(/Conclusion:?.*?(?=\n|$)/gs, '');
   text = text.replace(/In conclusion:?.*?(?=\n|$)/gs, '');
   text = text.replace(/To maximize engagement.*?(?=\n|$)/gs, '');
+  text = text.replace(/Together, we craft insights.*?(?=\n|$)/gs, '');
   
   // Remove any lines starting with common chatbot phrases
   text = text.replace(/^(Now|Well|Alright|Here's|Based on|Let's|Absolutely).*?\n/gm, '');
@@ -31,6 +32,10 @@ export function cleanResponse(text: string) {
   // Remove quotes with attribution and emoji-wrapped text
   text = text.replace(/["'].*?- [A-Za-z]+["']/g, '');
   text = text.replace(/🔍.*?🔍/gs, '');
+  
+  // Remove any signature-style endings
+  text = text.replace(/[-—]\s*[A-Za-z]+\s*$/gm, '');
+  text = text.replace(/Let['']s continue this enlightening journey!.*$/gm, '');
   
   // Clean up extra newlines and spaces
   text = text.replace(/\n{3,}/g, '\n\n');
