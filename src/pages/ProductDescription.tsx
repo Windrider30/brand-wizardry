@@ -1,12 +1,8 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Sparkles } from "lucide-react";
 import { generateProductDescription, ProductDescriptionResponse } from "@/services/productDescriptionService";
+import { ProductDescriptionForm } from "@/components/product-description/ProductDescriptionForm";
+import { GeneratedContent } from "@/components/product-description/GeneratedContent";
 
 export default function ProductDescription() {
   const { toast } = useToast();
@@ -62,104 +58,13 @@ export default function ProductDescription() {
       </div>
 
       <div className="grid gap-8 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              Product Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="brandBible">Your Brand Bible</Label>
-                <Textarea
-                  id="brandBible"
-                  placeholder="Paste your brand bible content here"
-                  className="min-h-[200px]"
-                  value={productInfo.brandBible}
-                  onChange={(e) => setProductInfo({ ...productInfo, brandBible: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="productName">Product Name</Label>
-                <Input
-                  id="productName"
-                  placeholder="e.g., Shadow Fae's Embrace Blanket"
-                  value={productInfo.name}
-                  onChange={(e) => setProductInfo({ ...productInfo, name: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="features">Key Features & Benefits</Label>
-                <Textarea
-                  id="features"
-                  placeholder="List the main features and benefits of your product"
-                  value={productInfo.features}
-                  onChange={(e) => setProductInfo({ ...productInfo, features: e.target.value })}
-                  required
-                />
-              </div>
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating Content...
-                  </>
-                ) : (
-                  "Generate Content"
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {generatedContent && (
-          <div className="space-y-8">
-            <Card>
-              <CardHeader>
-                <CardTitle>Marketing Hooks</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="list-disc pl-4 space-y-2">
-                  {generatedContent.marketingHooks.map((hook, index) => (
-                    <li key={index} className="text-sm">{hook}</li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>SEO Descriptions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {generatedContent.seoDescriptions.map((desc, index) => (
-                    <div key={index} className="prose prose-sm">
-                      <h3 className="text-sm font-medium mb-2">Version {index + 1}</h3>
-                      <div className="whitespace-pre-wrap text-sm">{desc}</div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Meta Description</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-sm whitespace-pre-wrap">{generatedContent.metaDescription}</div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        <ProductDescriptionForm
+          productInfo={productInfo}
+          setProductInfo={setProductInfo}
+          onSubmit={handleSubmit}
+          isLoading={isLoading}
+        />
+        {generatedContent && <GeneratedContent content={generatedContent} />}
       </div>
     </div>
   );
