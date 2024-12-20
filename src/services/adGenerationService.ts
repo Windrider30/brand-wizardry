@@ -4,6 +4,7 @@ import { toast } from "@/components/ui/use-toast";
 interface GenerateAdParams {
   brandBible: string;
   platform: string;
+  adType: string;
   productUrl?: string;
   productTitle?: string;
   productDescription?: string;
@@ -12,6 +13,7 @@ interface GenerateAdParams {
 export async function generateAd({
   brandBible,
   platform,
+  adType,
   productUrl,
   productTitle,
   productDescription,
@@ -21,6 +23,7 @@ export async function generateAd({
       body: {
         brandBible,
         platform,
+        adType,
         productUrl,
         productTitle,
         productDescription,

@@ -10,7 +10,8 @@ export default function AdGeneration() {
   const [generatedContent, setGeneratedContent] = useState("");
   const [formData, setFormData] = useState({
     brandBible: "",
-    platform: "facebook", // or "instagram"
+    platform: "facebook",
+    adType: "awareness",
     productUrl: "",
     productTitle: "",
     productDescription: "",
@@ -32,6 +33,15 @@ export default function AdGeneration() {
       toast({
         title: "Missing Product Information",
         description: "Please provide either a URL or title and description.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.adType) {
+      toast({
+        title: "Missing Ad Type",
+        description: "Please select an ad type.",
         variant: "destructive",
       });
       return;

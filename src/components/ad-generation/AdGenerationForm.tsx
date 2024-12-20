@@ -3,12 +3,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface FormData {
   brandBible: string;
   platform: string;
+  adType: string;
   productUrl: string;
   productTitle: string;
   productDescription: string;
@@ -65,6 +67,26 @@ export function AdGenerationForm({
                 <Label htmlFor="instagram">Instagram</Label>
               </div>
             </RadioGroup>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Ad Type</Label>
+            <Select 
+              value={formData.adType} 
+              onValueChange={(value) => setFormData({ ...formData, adType: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select ad type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="awareness">Awareness Ads</SelectItem>
+                <SelectItem value="traffic">Traffic Ads</SelectItem>
+                <SelectItem value="engagement">Engagement Ads</SelectItem>
+                <SelectItem value="lead-generation">Lead Generation Ads</SelectItem>
+                <SelectItem value="app-promotion">App Promotion Ads</SelectItem>
+                <SelectItem value="sales">Sales Ads</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-4">
