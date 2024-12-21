@@ -12,20 +12,20 @@ const Index = () => {
     if (basePrice === 15) { // Beginner tier
       switch (duration) {
         case 'quarterly':
-          return '$36';
+          return '$36 USD';
         case 'yearly':
-          return '$108';
+          return '$108 USD';
         default:
-          return '$15';
+          return '$15 USD';
       }
     } else { // Professional tier
       switch (duration) {
         case 'quarterly':
-          return '$60';
+          return '$60 USD';
         case 'yearly':
-          return '$180';
+          return '$180 USD';
         default:
-          return '$25';
+          return '$25 USD';
       }
     }
   };
