@@ -58,6 +58,10 @@ const Index = () => {
             </Link>
           </div>
         </div>
+
+        <div className="mt-16 text-sm text-gray-500">
+          Powered by EcomCavalry
+        </div>
       </div>
     </div>
   );
