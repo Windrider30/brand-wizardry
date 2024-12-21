@@ -21,23 +21,8 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         .replace(/Excerpt:.*?(?=\n\n|\n#|$)/s, '')
         .trim();
 
-      // Add meta and excerpt at the end
-      if (metaMatch?.[1] || excerptMatch?.[1]) {
-        mainContent += '\n\n--- SEO Information ---\n\n';
-        if (metaMatch?.[1]) {
-          mainContent += `Meta Description:${metaMatch[1]}\n\n`;
-        }
-        if (excerptMatch?.[1]) {
-          mainContent += `Excerpt:${excerptMatch[1]}`;
-        }
-      }
-      
-      // Convert markdown to HTML with special handling for meta and excerpt
+      // Convert main content to HTML
       let htmlContent = mainContent
-        // Handle meta description and excerpt with special styling
-        .replace(/Meta Description:(.*?)(?=\n\n|\n#|$)/gs, '<div class="meta-description"><h3>Meta Description:</h3><p>$1</p></div>')
-        .replace(/Excerpt:(.*?)(?=\n\n|\n#|$)/gs, '<div class="excerpt"><h3>Excerpt:</h3><p>$1</p></div>')
-        // Then handle the rest of the content
         .replace(/^# (.*$)/gm, '<h1>$1</h1>')
         .replace(/^## (.*$)/gm, '<h2>$1</h2>')
         .replace(/^### (.*$)/gm, '<h3>$1</h3>')
@@ -48,8 +33,30 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
         .replace(/^\d+\. (.*$)/gm, '<li>$1</li>')
         .replace(/(<li>\d+\. .*<\/li>\n?)+/g, '<ol>$&</ol>')
-        .replace(/^(?!<[uo]l|<li|<h[1-6]|<img|<a|<div)(.*$)/gm, '<p>$1</p>')
+        .replace(/^(?!<[uo]l|<li|<h[1-6]|<img|<a)(.*$)/gm, '<p>$1</p>')
         .replace(/\n\n/g, '\n');
+
+      // Add SEO information section at the end if meta or excerpt exists
+      if (metaMatch?.[1] || excerptMatch?.[1]) {
+        htmlContent += '\n<div style="margin-top: 40px; padding: 20px; border: 2px solid #0EA5E9; border-radius: 8px; background-color: #f8fafc;">';
+        htmlContent += '\n<h2 style="color: #0EA5E9; margin-bottom: 20px;">SEO Information</h2>';
+        
+        if (metaMatch?.[1]) {
+          htmlContent += `\n<div style="margin-bottom: 20px;">
+            <h3 style="color: #0EA5E9; margin-bottom: 10px;">Meta Description:</h3>
+            <p style="color: #374151; line-height: 1.6;">${metaMatch[1].trim()}</p>
+          </div>`;
+        }
+        
+        if (excerptMatch?.[1]) {
+          htmlContent += `\n<div>
+            <h3 style="color: #0EA5E9; margin-bottom: 10px;">Excerpt:</h3>
+            <p style="color: #374151; line-height: 1.6;">${excerptMatch[1].trim()}</p>
+          </div>`;
+        }
+        
+        htmlContent += '\n</div>';
+      }
 
       await navigator.clipboard.writeText(htmlContent);
       toast({
