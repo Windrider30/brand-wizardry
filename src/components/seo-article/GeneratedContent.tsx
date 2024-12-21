@@ -25,11 +25,17 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
     }
   };
 
-  // Function to convert markdown-style content to HTML
+  // Function to convert text content to HTML with clickable links
   const convertToHtml = (content: string) => {
-    // Remove the markdown code block syntax if present
-    let htmlContent = content.replace(/```html\n|```/g, '');
+    // Remove any existing HTML tags first
+    let htmlContent = content.replace(/<[^>]*>/g, '');
     
+    // Convert URLs to clickable links
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    htmlContent = htmlContent.replace(urlRegex, (url) => {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">${url}</a>`;
+    });
+
     // Convert markdown headings to HTML
     htmlContent = htmlContent
       .replace(/^# (.*$)/gm, '<h1>$1</h1>')
@@ -43,10 +49,10 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
       htmlContent = `<p>${htmlContent}</p>`;
     }
 
-    // Sanitize the HTML content
+    // Sanitize the HTML content while allowing links
     return DOMPurify.sanitize(htmlContent, { 
-      ADD_TAGS: ['h1', 'h2', 'h3', 'p', 'br'],
-      ADD_ATTR: []
+      ADD_TAGS: ['h1', 'h2', 'h3', 'p', 'br', 'a'],
+      ADD_ATTR: ['href', 'target', 'rel', 'class']
     });
   };
 
@@ -63,7 +69,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
       </CardHeader>
       <CardContent>
         <div 
-          className="prose prose-sm max-w-none space-y-4 [&_h1]:text-2xl [&_h2]:text-xl [&_h3]:text-lg [&_p]:mb-4"
+          className="prose prose-sm max-w-none space-y-4 [&_h1]:text-2xl [&_h2]:text-xl [&_h3]:text-lg [&_p]:mb-4 [&_a]:text-primary [&_a]:no-underline hover:[&_a]:underline"
           dangerouslySetInnerHTML={{ __html: convertToHtml(content) }}
         />
       </CardContent>
