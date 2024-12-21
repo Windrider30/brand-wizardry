@@ -29,6 +29,12 @@ export function MainNav() {
           <Link to="/seo-article">
             <Button variant="ghost" className="text-lg">SEO Articles</Button>
           </Link>
+          <a href="mailto:support@brandforgefoundry.com.au" className="ml-4">
+            <Button variant="ghost" className="text-lg flex items-center gap-2">
+              <Mail className="h-5 w-5" />
+              Contact Support
+            </Button>
+          </a>
         </div>
       </div>
     </nav>
