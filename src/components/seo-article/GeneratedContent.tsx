@@ -11,10 +11,25 @@ interface GeneratedContentProps {
 export function GeneratedContent({ content }: GeneratedContentProps) {
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(content);
+      // Convert markdown to HTML before copying
+      const htmlContent = content
+        .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+        .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+        .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/!\[(.*?)\]\((.*?)\)/g, '<img alt="$1" src="$2" style="width: 100%;">')
+        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>')
+        .replace(/^\s*[-*+] (.*$)/gm, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+        .replace(/^\d+\. (.*$)/gm, '<li>$1</li>')
+        .replace(/(<li>\d+\. .*<\/li>\n?)+/g, '<ol>$&</ol>')
+        .replace(/^(?!<[uo]l|<li|<h[1-6]|<img|<a)(.*$)/gm, '<p>$1</p>')
+        .replace(/\n\n/g, '\n');
+
+      await navigator.clipboard.writeText(htmlContent);
       toast({
         title: "Copied!",
-        description: "Article copied to clipboard",
+        description: "Article copied to clipboard as HTML",
       });
     } catch (err) {
       toast({
@@ -32,44 +47,13 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
           Generated Article
           <Button variant="outline" size="sm" onClick={handleCopy}>
             <Copy className="h-4 w-4 mr-2" />
-            Copy
+            Copy as HTML
           </Button>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="prose prose-lg max-w-none dark:prose-invert">
-          <ReactMarkdown components={{
-            img: ({ node, ...props }) => (
-              <img className="w-full h-auto rounded-lg my-6" {...props} alt={props.alt || ''} />
-            ),
-            a: ({ node, ...props }) => (
-              <a className="text-blue-600 hover:underline dark:text-blue-400" target="_blank" rel="noopener noreferrer" {...props} />
-            ),
-            h1: ({ node, ...props }) => (
-              <h1 className="text-4xl font-bold mt-8 mb-6" {...props} />
-            ),
-            h2: ({ node, ...props }) => (
-              <h2 className="text-3xl font-bold mt-7 mb-5" {...props} />
-            ),
-            h3: ({ node, ...props }) => (
-              <h3 className="text-2xl font-bold mt-6 mb-4" {...props} />
-            ),
-            ul: ({ node, ...props }) => (
-              <ul className="list-disc pl-6 my-6 space-y-2" {...props} />
-            ),
-            ol: ({ node, ...props }) => (
-              <ol className="list-decimal pl-6 my-6 space-y-2" {...props} />
-            ),
-            p: ({ node, ...props }) => (
-              <p className="text-lg my-4 leading-relaxed" {...props} />
-            ),
-            strong: ({ node, ...props }) => (
-              <strong className="font-bold" {...props} />
-            ),
-            li: ({ node, ...props }) => (
-              <li className="text-lg my-2" {...props} />
-            )
-          }}>
+        <div className="prose max-w-none dark:prose-invert">
+          <ReactMarkdown>
             {content}
           </ReactMarkdown>
         </div>
