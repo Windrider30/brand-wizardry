@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import DOMPurify from "dompurify";
 
 interface GeneratedContentProps {
   content: string;
@@ -24,6 +25,17 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
     }
   };
 
+  // Function to extract and clean the HTML content from the code block
+  const extractHtmlContent = (content: string) => {
+    // Remove the markdown code block syntax if present
+    const htmlContent = content.replace(/```html\n|```/g, '');
+    // Sanitize the HTML content
+    return DOMPurify.sanitize(htmlContent, { 
+      ADD_TAGS: ['a'],
+      ADD_ATTR: ['href', 'target']
+    });
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -38,7 +50,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
       <CardContent>
         <div 
           className="prose prose-sm max-w-none"
-          dangerouslySetInnerHTML={{ __html: content }}
+          dangerouslySetInnerHTML={{ __html: extractHtmlContent(content) }}
         />
       </CardContent>
     </Card>
