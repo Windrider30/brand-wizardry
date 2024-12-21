@@ -15,9 +15,26 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
       const metaMatch = content.match(/Meta Description:(.*?)(?=\n\n|\n#|$)/s);
       const excerptMatch = content.match(/Excerpt:(.*?)(?=\n\n|\n#|$)/s);
       
+      // Remove meta and excerpt from main content
+      let mainContent = content
+        .replace(/Meta Description:.*?(?=\n\n|\n#|$)/s, '')
+        .replace(/Excerpt:.*?(?=\n\n|\n#|$)/s, '')
+        .trim();
+
+      // Add meta and excerpt at the end
+      if (metaMatch?.[1] || excerptMatch?.[1]) {
+        mainContent += '\n\n--- SEO Information ---\n\n';
+        if (metaMatch?.[1]) {
+          mainContent += `Meta Description:${metaMatch[1]}\n\n`;
+        }
+        if (excerptMatch?.[1]) {
+          mainContent += `Excerpt:${excerptMatch[1]}`;
+        }
+      }
+      
       // Convert markdown to HTML with special handling for meta and excerpt
-      let htmlContent = content
-        // Handle meta description and excerpt first
+      let htmlContent = mainContent
+        // Handle meta description and excerpt with special styling
         .replace(/Meta Description:(.*?)(?=\n\n|\n#|$)/gs, '<div class="meta-description"><h3>Meta Description:</h3><p>$1</p></div>')
         .replace(/Excerpt:(.*?)(?=\n\n|\n#|$)/gs, '<div class="excerpt"><h3>Excerpt:</h3><p>$1</p></div>')
         // Then handle the rest of the content
