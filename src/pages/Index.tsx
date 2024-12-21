@@ -18,7 +18,7 @@ const Index = () => {
             <h2 className="text-xl font-semibold mb-2 text-[#0EA5E9]">Brand Bible</h2>
             <p className="text-black text-lg mb-4">Define your brand's voice, values, and vision</p>
             <Link to="/brand-bible">
-              <Button variant="outline" className="w-full">Get Started</Button>
+              <Button variant="outline" className="w-full text-lg border-black">Get Started</Button>
             </Link>
           </div>
 
@@ -27,7 +27,7 @@ const Index = () => {
             <h2 className="text-xl font-semibold mb-2 text-[#0EA5E9]">Product Descriptions</h2>
             <p className="text-black text-lg mb-4">Generate compelling product content</p>
             <Link to="/product-description">
-              <Button variant="outline" className="w-full">Get Started</Button>
+              <Button variant="outline" className="w-full text-lg border-black">Get Started</Button>
             </Link>
           </div>
 
@@ -36,7 +36,7 @@ const Index = () => {
             <h2 className="text-xl font-semibold mb-2 text-[#0EA5E9]">Social Posts</h2>
             <p className="text-black text-lg mb-4">Generate content for Facebook, Instagram, and Pinterest</p>
             <Link to="/social-posts">
-              <Button variant="outline" className="w-full">Get Started</Button>
+              <Button variant="outline" className="w-full text-lg border-black">Get Started</Button>
             </Link>
           </div>
 
@@ -45,7 +45,7 @@ const Index = () => {
             <h2 className="text-xl font-semibold mb-2 text-[#0EA5E9]">Email Content</h2>
             <p className="text-black text-lg mb-4">Create compelling email campaigns</p>
             <Link to="/email-content">
-              <Button variant="outline" className="w-full">Get Started</Button>
+              <Button variant="outline" className="w-full text-lg border-black">Get Started</Button>
             </Link>
           </div>
 
@@ -54,7 +54,7 @@ const Index = () => {
             <h2 className="text-xl font-semibold mb-2 text-[#0EA5E9]">Ad Generation</h2>
             <p className="text-black text-lg mb-4">Create Facebook and Instagram ads</p>
             <Link to="/ad-generation">
-              <Button variant="outline" className="w-full">Get Started</Button>
+              <Button variant="outline" className="w-full text-lg border-black">Get Started</Button>
             </Link>
           </div>
 
@@ -63,7 +63,7 @@ const Index = () => {
             <h2 className="text-xl font-semibold mb-2 text-[#0EA5E9]">SEO Articles</h2>
             <p className="text-black text-lg mb-4">Generate optimized content for your blog</p>
             <Link to="/seo-article">
-              <Button variant="outline" className="w-full">Get Started</Button>
+              <Button variant="outline" className="w-full text-lg border-black">Get Started</Button>
             </Link>
           </div>
         </div>
