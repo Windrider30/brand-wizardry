@@ -87,7 +87,7 @@ Remember to maintain the brand voice throughout, use the provided images effecti
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
