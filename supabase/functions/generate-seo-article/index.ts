@@ -78,7 +78,7 @@ Present your article as properly formatted HTML, including:
 - Use of <ul>, <ol>, and <li> tags for lists
 - The 100-word excerpt in a <div> with a class="article-excerpt"
 
-Remember to maintain the brand voice throughout, use the provided images effectively, and create content that is both informative and optimized for search engines. Use only straight quotes (") and not curly quotes anywhere in the HTML.`;
+IMPORTANT: Do not include any meta-commentary or notes about the article at the end. The content should end with the article's conclusion and call-to-action.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -91,7 +91,7 @@ Remember to maintain the brand voice throughout, use the provided images effecti
         messages: [
           {
             role: "system",
-            content: "You are an expert SEO content writer who creates engaging, well-structured articles that incorporate products and images naturally while maintaining brand voice and SEO best practices. You MUST generate articles that are approximately 1,500 words long."
+            content: "You are an expert SEO content writer who creates engaging, well-structured articles that incorporate products and images naturally while maintaining brand voice and SEO best practices. You MUST generate articles that are approximately 1,500 words long. Do not include any meta-commentary or notes about the article structure at the end of your response."
           },
           {
             role: "user",
@@ -99,7 +99,7 @@ Remember to maintain the brand voice throughout, use the provided images effecti
           }
         ],
         temperature: 0.7,
-        max_tokens: 4000, // Increased to ensure we can get 1,500 words
+        max_tokens: 4000,
       }),
     });
 
@@ -110,7 +110,11 @@ Remember to maintain the brand voice throughout, use the provided images effecti
       throw new Error(`OpenAI API error: ${JSON.stringify(data)}`);
     }
     
-    const generatedContent = data.choices[0].message.content;
+    let generatedContent = data.choices[0].message.content;
+    
+    // Remove any trailing meta-commentary that might appear after the HTML content
+    generatedContent = generatedContent.replace(/```[\s\S]*$/, '');
+    generatedContent = generatedContent.replace(/This HTML document[\s\S]*$/, '');
     
     return new Response(JSON.stringify({ content: generatedContent }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
