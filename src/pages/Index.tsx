@@ -9,13 +9,24 @@ const Index = () => {
   const [duration, setDuration] = useState<'monthly' | 'quarterly' | 'yearly'>('monthly');
 
   const getPriceForDuration = (basePrice: number) => {
-    switch (duration) {
-      case 'quarterly':
-        return `$${(basePrice * 3 * 0.9).toFixed(0)}`; // 10% discount
-      case 'yearly':
-        return `$${(basePrice * 12 * 0.8).toFixed(0)}`; // 20% discount
-      default:
-        return `$${basePrice}`;
+    if (basePrice === 15) { // Beginner tier
+      switch (duration) {
+        case 'quarterly':
+          return '$36';
+        case 'yearly':
+          return '$108';
+        default:
+          return '$15';
+      }
+    } else { // Professional tier
+      switch (duration) {
+        case 'quarterly':
+          return '$60';
+        case 'yearly':
+          return '$180';
+        default:
+          return '$25';
+      }
     }
   };
 
