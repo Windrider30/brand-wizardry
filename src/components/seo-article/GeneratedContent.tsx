@@ -37,34 +37,37 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="prose prose-sm max-w-none dark:prose-invert">
+        <div className="prose prose-lg max-w-none dark:prose-invert">
           <ReactMarkdown components={{
             img: ({ node, ...props }) => (
-              <img className="w-full h-auto rounded-lg my-4" {...props} alt={props.alt || ''} />
+              <img className="w-full h-auto rounded-lg my-6" {...props} alt={props.alt || ''} />
             ),
             a: ({ node, ...props }) => (
-              <a className="text-primary hover:underline" target="_blank" rel="noopener noreferrer" {...props} />
+              <a className="text-blue-600 hover:underline dark:text-blue-400" target="_blank" rel="noopener noreferrer" {...props} />
             ),
             h1: ({ node, ...props }) => (
-              <h1 className="text-3xl font-bold mt-6 mb-4" {...props} />
+              <h1 className="text-4xl font-bold mt-8 mb-6" {...props} />
             ),
             h2: ({ node, ...props }) => (
-              <h2 className="text-2xl font-bold mt-5 mb-3" {...props} />
+              <h2 className="text-3xl font-bold mt-7 mb-5" {...props} />
             ),
             h3: ({ node, ...props }) => (
-              <h3 className="text-xl font-bold mt-4 mb-2" {...props} />
+              <h3 className="text-2xl font-bold mt-6 mb-4" {...props} />
             ),
             ul: ({ node, ...props }) => (
-              <ul className="list-disc pl-6 my-4" {...props} />
+              <ul className="list-disc pl-6 my-6 space-y-2" {...props} />
             ),
             ol: ({ node, ...props }) => (
-              <ol className="list-decimal pl-6 my-4" {...props} />
+              <ol className="list-decimal pl-6 my-6 space-y-2" {...props} />
             ),
             p: ({ node, ...props }) => (
-              <p className="my-3" {...props} />
+              <p className="text-lg my-4 leading-relaxed" {...props} />
             ),
             strong: ({ node, ...props }) => (
               <strong className="font-bold" {...props} />
+            ),
+            li: ({ node, ...props }) => (
+              <li className="text-lg my-2" {...props} />
             )
           }}>
             {content}
