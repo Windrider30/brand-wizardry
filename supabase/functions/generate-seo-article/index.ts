@@ -54,8 +54,17 @@ Important Instructions:
 4. Naturally incorporate the keywords throughout the text
 5. Make the content informative and valuable to readers
 6. Include the exact product URLs as provided without any modifications
+7. At the end of the article, provide:
+   - A meta description (maximum 160 characters) that compellingly summarizes the article for search engines
+   - A 100-word excerpt that captures the essence of the article for preview purposes
 
-Return the article in plain text format, using standard markdown-style formatting for headings (# for h1, ## for h2, etc).`;
+Return the article in plain text format, using standard markdown-style formatting for headings (# for h1, ## for h2, etc). Place the meta description and excerpt at the end of the article under their respective headers:
+
+Meta Description:
+[Your 160-character meta description here]
+
+Excerpt:
+[Your 100-word excerpt here]`;
 
     console.log('Sending request to OpenAI...');
 
