@@ -27,25 +27,23 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
 
   // Function to convert text content to HTML with clickable links and images
   const convertToHtml = (content: string) => {
-    // First, handle image URLs and their corresponding product links
     const lines = content.split('\n');
-    let processedLines = [];
+    const processedLines = [];
     
     for (let i = 0; i < lines.length; i++) {
-      const currentLine = lines[i];
-      const nextLine = lines[i + 1];
+      const currentLine = lines[i].trim();
+      const nextLine = i + 1 < lines.length ? lines[i + 1].trim() : '';
       
       // Check if current line is an image URL and next line is a product URL
       if (
-        currentLine.trim().match(/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)/i) &&
-        nextLine?.trim().match(/^https?:\/\/.*\/products\//)
+        currentLine.match(/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)/i) &&
+        nextLine.match(/^https?:\/\/.*\/products\//)
       ) {
-        // Create a product card with image and link
         processedLines.push(`
           <div class="product-card mb-6 rounded-lg overflow-hidden border border-gray-200">
-            <img src="${currentLine.trim()}" alt="Product" class="w-full h-auto object-cover max-h-[400px]" />
+            <img src="${currentLine}" alt="Product" class="w-full h-auto object-cover max-h-[400px]" loading="lazy" />
             <div class="p-4">
-              <a href="${nextLine.trim()}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline block">
+              <a href="${nextLine}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline block">
                 View Product
               </a>
             </div>
@@ -53,37 +51,42 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         `);
         i++; // Skip the next line since we've processed it
       } else {
-        // Handle regular URLs that aren't part of an image-product pair
-        const urlRegex = /(https?:\/\/[^\s]+)/g;
-        const processedLine = currentLine.replace(urlRegex, (url) => {
-          if (url.match(/\.(jpg|jpeg|png|gif|webp)/i)) {
-            return `<img src="${url}" alt="Product" class="w-full h-auto object-cover mb-4 max-h-[400px]" />`;
+        // Handle regular URLs and standalone images
+        let processedLine = currentLine;
+        
+        // Convert image URLs to img tags
+        if (currentLine.match(/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)/i)) {
+          processedLine = `<img src="${currentLine}" alt="Product" class="w-full h-auto object-cover mb-4 max-h-[400px]" loading="lazy" />`;
+        } 
+        // Convert product URLs to links
+        else if (currentLine.match(/^https?:\/\/.*\/products\//)) {
+          processedLine = `<a href="${currentLine}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline block mb-4">View Product</a>`;
+        }
+        // Convert markdown headings and regular text
+        else {
+          // Convert markdown headings
+          processedLine = processedLine
+            .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold mb-4">$1</h1>')
+            .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-bold mb-3">$1</h2>')
+            .replace(/^### (.*$)/gm, '<h3 class="text-xl font-bold mb-2">$1</h3>');
+          
+          // If it's not a heading, wrap in paragraph tags if needed
+          if (!processedLine.startsWith('<h') && processedLine.length > 0) {
+            processedLine = `<p class="mb-4">${processedLine}</p>`;
           }
-          return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">${url}</a>`;
-        });
+        }
+        
         processedLines.push(processedLine);
       }
     }
     
-    let htmlContent = processedLines.join('\n');
-
-    // Convert markdown headings to HTML
-    htmlContent = htmlContent
-      .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-      .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-      .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-      .replace(/\n\n/g, '</p><p>')
-      .replace(/\n/g, '<br/>');
-
-    // Wrap the content in a paragraph tag if it doesn't start with a heading
-    if (!htmlContent.startsWith('<h') && !htmlContent.startsWith('<div class="product-card"')) {
-      htmlContent = `<p>${htmlContent}</p>`;
-    }
-
-    // Sanitize the HTML content while allowing necessary tags and attributes
-    return DOMPurify.sanitize(htmlContent, { 
+    // Join all processed lines
+    const htmlContent = processedLines.join('\n');
+    
+    // Sanitize the HTML content
+    return DOMPurify.sanitize(htmlContent, {
       ADD_TAGS: ['h1', 'h2', 'h3', 'p', 'br', 'a', 'img', 'div'],
-      ADD_ATTR: ['href', 'target', 'rel', 'class', 'src', 'alt'],
+      ADD_ATTR: ['href', 'target', 'rel', 'class', 'src', 'alt', 'loading'],
     });
   };
 
