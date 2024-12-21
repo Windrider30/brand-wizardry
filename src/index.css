@@ -35,19 +35,12 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -97,5 +90,52 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  h1 {
+    @apply text-[#0EA5E9] text-5xl font-bold;
+  }
+
+  p {
+    @apply text-black;
+  }
+}
+
+@layer components {
+  .seo-article-content {
+    @apply prose-lg max-w-none;
+  }
+  
+  .seo-article-content h1 {
+    @apply text-3xl font-bold mb-6 mt-8;
+  }
+  
+  .seo-article-content h2 {
+    @apply text-2xl font-bold mb-4 mt-6;
+  }
+  
+  .seo-article-content h3 {
+    @apply text-xl font-bold mb-3 mt-5;
+  }
+  
+  .seo-article-content p {
+    @apply text-base mb-4 leading-relaxed;
+  }
+  
+  .seo-article-content a {
+    @apply text-primary no-underline font-medium hover:underline;
+  }
+  
+  .seo-article-content img {
+    @apply my-8 w-full;
+  }
+  
+  .seo-article-content ul,
+  .seo-article-content ol {
+    @apply my-4;
+  }
+  
+  .seo-article-content li {
+    @apply my-2;
   }
 }
