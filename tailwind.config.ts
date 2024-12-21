@@ -24,15 +24,41 @@ const config = {
           css: {
             maxWidth: 'none',
             img: {
-              marginTop: '1em',
-              marginBottom: '1em',
+              marginTop: '2em',
+              marginBottom: '2em',
             },
             'code::before': {
               content: '""'
             },
             'code::after': {
               content: '""'
-            }
+            },
+            a: {
+              color: 'hsl(var(--primary))',
+              textDecoration: 'none',
+              fontWeight: '500',
+              '&:hover': {
+                textDecoration: 'underline',
+              },
+            },
+            p: {
+              marginTop: '1.25em',
+              marginBottom: '1.25em',
+              lineHeight: '1.75',
+            },
+            'h1, h2, h3': {
+              marginTop: '2em',
+              marginBottom: '1em',
+              lineHeight: '1.3',
+            },
+            ul: {
+              marginTop: '1.25em',
+              marginBottom: '1.25em',
+            },
+            li: {
+              marginTop: '0.5em',
+              marginBottom: '0.5em',
+            },
           }
         }
       },

@@ -14,7 +14,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
       // Convert markdown to HTML before copying
       const htmlContent = content
         .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-        .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+        .replace(/^## (.*$)/gm, '<h2>$2</h2>')
         .replace(/^### (.*$)/gm, '<h3>$1</h3>')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/!\[(.*?)\]\((.*?)\)/g, '<img alt="$1" src="$2" style="width: 100%;">')
@@ -52,7 +52,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="prose max-w-none dark:prose-invert">
+        <div className="prose prose-lg max-w-none dark:prose-invert prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-p:text-base prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-img:my-8">
           <ReactMarkdown>
             {content}
           </ReactMarkdown>
