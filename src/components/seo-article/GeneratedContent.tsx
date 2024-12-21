@@ -11,8 +11,16 @@ interface GeneratedContentProps {
 export function GeneratedContent({ content }: GeneratedContentProps) {
   const handleCopy = async () => {
     try {
-      // Convert markdown to HTML with improved meta description handling
-      const htmlContent = content
+      // First, extract meta description and excerpt
+      const metaMatch = content.match(/Meta Description:(.*?)(?=\n\n|\n#|$)/s);
+      const excerptMatch = content.match(/Excerpt:(.*?)(?=\n\n|\n#|$)/s);
+      
+      // Convert markdown to HTML with special handling for meta and excerpt
+      let htmlContent = content
+        // Handle meta description and excerpt first
+        .replace(/Meta Description:(.*?)(?=\n\n|\n#|$)/gs, '<div class="meta-description"><h3>Meta Description:</h3><p>$1</p></div>')
+        .replace(/Excerpt:(.*?)(?=\n\n|\n#|$)/gs, '<div class="excerpt"><h3>Excerpt:</h3><p>$1</p></div>')
+        // Then handle the rest of the content
         .replace(/^# (.*$)/gm, '<h1>$1</h1>')
         .replace(/^## (.*$)/gm, '<h2>$1</h2>')
         .replace(/^### (.*$)/gm, '<h3>$1</h3>')
@@ -23,11 +31,8 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
         .replace(/^\d+\. (.*$)/gm, '<li>$1</li>')
         .replace(/(<li>\d+\. .*<\/li>\n?)+/g, '<ol>$&</ol>')
-        .replace(/^(?!<[uo]l|<li|<h[1-6]|<img|<a)(.*$)/gm, '<p>$1</p>')
-        .replace(/\n\n/g, '\n')
-        // Add meta description handling
-        .replace(/Meta Description:(.*?)(?=\n\n|\n#|$)/gs, '<div class="meta-description"><strong>Meta Description:</strong>$1</div>')
-        .replace(/Excerpt:(.*?)(?=\n\n|\n#|$)/gs, '<div class="excerpt"><strong>Excerpt:</strong>$1</div>');
+        .replace(/^(?!<[uo]l|<li|<h[1-6]|<img|<a|<div)(.*$)/gm, '<p>$1</p>')
+        .replace(/\n\n/g, '\n');
 
       await navigator.clipboard.writeText(htmlContent);
       toast({

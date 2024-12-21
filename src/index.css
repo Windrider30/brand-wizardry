@@ -141,6 +141,16 @@
 
   .seo-article-content .meta-description,
   .seo-article-content .excerpt {
-    @apply my-4 p-4 bg-gray-50 rounded-lg border border-gray-200;
+    @apply my-6 p-6 bg-gray-50 rounded-lg border-2 border-[#0EA5E9] shadow-sm;
+  }
+
+  .seo-article-content .meta-description h3,
+  .seo-article-content .excerpt h3 {
+    @apply text-lg font-bold mb-2 text-[#0EA5E9];
+  }
+
+  .seo-article-content .meta-description p,
+  .seo-article-content .excerpt p {
+    @apply text-gray-700 mt-0;
   }
 }
