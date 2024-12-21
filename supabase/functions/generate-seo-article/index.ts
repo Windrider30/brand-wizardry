@@ -55,7 +55,7 @@ Writing Style and Content:
 a) Adhere to the tone and style guidelines outlined in the brand bible.
 b) Use the appropriate level of formality, humor, or technical language as specified.
 c) Maintain consistency in voice throughout the article.
-d) The article should be approximately 1,500 words long.
+d) The article MUST be approximately 1,500 words long. This is a strict requirement - do not generate less content.
 e) Provide in-depth, valuable information on the topic.
 f) Include practical examples, case studies, or data points to support your arguments.
 g) Address potential questions or concerns the reader might have about the topic.
@@ -91,13 +91,15 @@ Remember to maintain the brand voice throughout, use the provided images effecti
         messages: [
           {
             role: "system",
-            content: "You are an expert SEO content writer who creates engaging, well-structured articles that incorporate products and images naturally while maintaining brand voice and SEO best practices."
+            content: "You are an expert SEO content writer who creates engaging, well-structured articles that incorporate products and images naturally while maintaining brand voice and SEO best practices. You MUST generate articles that are approximately 1,500 words long."
           },
           {
             role: "user",
             content: prompt
           }
         ],
+        temperature: 0.7,
+        max_tokens: 4000, // Increased to ensure we can get 1,500 words
       }),
     });
 
