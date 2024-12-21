@@ -72,6 +72,45 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_article_generations: {
+        Row: {
+          brand_bible: string
+          created_at: string
+          generated_content: string | null
+          id: string
+          image_urls: string[] | null
+          keywords: string[] | null
+          product_urls: string[] | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brand_bible: string
+          created_at?: string
+          generated_content?: string | null
+          id?: string
+          image_urls?: string[] | null
+          keywords?: string[] | null
+          product_urls?: string[] | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brand_bible?: string
+          created_at?: string
+          generated_content?: string | null
+          id?: string
+          image_urls?: string[] | null
+          keywords?: string[] | null
+          product_urls?: string[] | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

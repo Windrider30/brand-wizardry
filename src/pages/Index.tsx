@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { BookOpen, MessageSquare, Mail, Tag, Target } from "lucide-react";
+import { BookOpen, MessageSquare, Mail, Tag, Target, FileText } from "lucide-react";
 
 const Index = () => {
   return (
@@ -12,7 +12,7 @@ const Index = () => {
           Create your brand bible and generate on-brand content using the power of AI
         </p>
         
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-5 max-w-6xl mx-auto">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-6 max-w-6xl mx-auto">
           <div className="p-6 border rounded-lg">
             <BookOpen className="w-12 h-12 text-primary mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Brand Bible</h2>
@@ -54,6 +54,15 @@ const Index = () => {
             <h2 className="text-xl font-semibold mb-2">Ad Generation</h2>
             <p className="text-gray-600 mb-4">Create Facebook and Instagram ads</p>
             <Link to="/ad-generation">
+              <Button variant="outline" className="w-full">Get Started</Button>
+            </Link>
+          </div>
+
+          <div className="p-6 border rounded-lg">
+            <FileText className="w-12 h-12 text-primary mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">SEO Articles</h2>
+            <p className="text-gray-600 mb-4">Generate optimized content for your blog</p>
+            <Link to="/seo-article">
               <Button variant="outline" className="w-full">Get Started</Button>
             </Link>
           </div>

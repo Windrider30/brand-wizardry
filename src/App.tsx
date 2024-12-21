@@ -10,6 +10,7 @@ import ProductDescription from "./pages/ProductDescription";
 import SocialPosts from "./pages/SocialPosts";
 import EmailContent from "./pages/EmailContent";
 import AdGeneration from "./pages/AdGeneration";
+import SeoArticle from "./pages/SeoArticle";
 import Login from "./pages/Login";
 import { useEffect, useState } from "react";
 import { supabase } from "./integrations/supabase/client";
@@ -91,6 +92,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AdGeneration />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/seo-article"
+              element={
+                <ProtectedRoute>
+                  <SeoArticle />
                 </ProtectedRoute>
               }
             />
