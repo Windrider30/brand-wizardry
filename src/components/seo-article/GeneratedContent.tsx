@@ -27,11 +27,8 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
 
   // Function to convert text content to HTML with clickable links and images
   const convertToHtml = (content: string) => {
-    // Remove any existing HTML tags first
-    let htmlContent = content.replace(/<[^>]*>/g, '');
-    
     // First, handle image URLs and their corresponding product links
-    const lines = htmlContent.split('\n');
+    const lines = content.split('\n');
     let processedLines = [];
     
     for (let i = 0; i < lines.length; i++) {
@@ -46,7 +43,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         // Create a product card with image and link
         processedLines.push(`
           <div class="product-card mb-6 rounded-lg overflow-hidden border border-gray-200">
-            <img src="${currentLine.trim()}" alt="Product" class="w-full h-auto object-cover" />
+            <img src="${currentLine.trim()}" alt="Product" class="w-full h-auto object-cover max-h-[400px]" />
             <div class="p-4">
               <a href="${nextLine.trim()}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline block">
                 View Product
@@ -60,7 +57,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         const urlRegex = /(https?:\/\/[^\s]+)/g;
         const processedLine = currentLine.replace(urlRegex, (url) => {
           if (url.match(/\.(jpg|jpeg|png|gif|webp)/i)) {
-            return `<img src="${url}" alt="Product" class="w-full h-auto object-cover mb-4" />`;
+            return `<img src="${url}" alt="Product" class="w-full h-auto object-cover mb-4 max-h-[400px]" />`;
           }
           return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">${url}</a>`;
         });
@@ -68,7 +65,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
       }
     }
     
-    htmlContent = processedLines.join('\n');
+    let htmlContent = processedLines.join('\n');
 
     // Convert markdown headings to HTML
     htmlContent = htmlContent
