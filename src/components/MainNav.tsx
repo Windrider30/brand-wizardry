@@ -8,7 +8,7 @@ export function MainNav() {
       <div className="container flex h-16 items-center px-4">
         <Link to="/" className="flex items-center space-x-2">
           <BookOpen className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold">BrandAI</span>
+          <span className="text-xl font-bold">Brand Forge Foundry</span>
         </Link>
         <div className="ml-auto flex items-center space-x-4">
           <Link to="/brand-bible">

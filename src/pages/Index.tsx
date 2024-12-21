@@ -6,7 +6,7 @@ const Index = () => {
   return (
     <div className="container py-12">
       <div className="text-center space-y-6">
-        <h1 className="text-5xl font-bold text-primary">Welcome to BrandAI</h1>
+        <h1 className="text-5xl font-bold text-primary">Welcome to Brand Forge Foundry</h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
           Create your brand bible and generate on-brand content using the power of AI
         </p>
