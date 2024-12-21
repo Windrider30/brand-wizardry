@@ -147,15 +147,82 @@ export type Database = {
         }
         Relationships: []
       }
+      tier_limits: {
+        Row: {
+          created_at: string
+          generation_type: string
+          id: string
+          monthly_limit: number
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          generation_type: string
+          id?: string
+          monthly_limit: number
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          generation_type?: string
+          id?: string
+          monthly_limit?: number
+          tier?: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      usage_tracking: {
+        Row: {
+          count: number | null
+          created_at: string
+          generation_type: string
+          id: string
+          reset_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          count?: number | null
+          created_at?: string
+          generation_type: string
+          id?: string
+          reset_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          count?: number | null
+          created_at?: string
+          generation_type?: string
+          id?: string
+          reset_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_generation_limit: {
+        Args: {
+          p_user_id: string
+          p_generation_type: string
+        }
+        Returns: {
+          can_generate: boolean
+          remaining: number
+          reset_date: string
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      subscription_tier: "beginner" | "professional"
     }
     CompositeTypes: {
       [_ in never]: never

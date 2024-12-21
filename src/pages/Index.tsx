@@ -1,8 +1,27 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { BookOpen, MessageSquare, Mail, Tag, Target, FileText } from "lucide-react";
+import { PricingCard } from "@/components/pricing/PricingCard";
 
 const Index = () => {
+  const beginnerFeatures = [
+    { name: "Brand Bibles", limit: 2 },
+    { name: "Product Descriptions", limit: 25 },
+    { name: "Social Posts", limit: 10 },
+    { name: "Email Posts", limit: 10 },
+    { name: "Ad Generations", limit: 10 },
+    { name: "Blog Posts", limit: 20 },
+  ];
+
+  const professionalFeatures = [
+    { name: "Brand Bibles", limit: 15 },
+    { name: "Product Descriptions", limit: 50 },
+    { name: "Social Posts", limit: 25 },
+    { name: "Email Posts", limit: 20 },
+    { name: "Ad Generations", limit: 30 },
+    { name: "Blog Posts", limit: 40 },
+  ];
+
   return (
     <div className="container px-4 py-8 md:py-12">
       <div className="text-center space-y-4 md:space-y-6">
@@ -65,6 +84,27 @@ const Index = () => {
             <Link to="/seo-article" className="block">
               <Button variant="outline" className="w-full text-base md:text-lg border-black">Get Started</Button>
             </Link>
+          </div>
+        </div>
+
+        {/* Pricing Section */}
+        <div className="mt-20">
+          <h2 className="text-3xl font-bold mb-12">Choose Your Plan</h2>
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <PricingCard
+              title="Beginner"
+              price="$15"
+              features={beginnerFeatures}
+              tier="beginner"
+              duration="monthly"
+            />
+            <PricingCard
+              title="Professional"
+              price="$25"
+              features={professionalFeatures}
+              tier="professional"
+              duration="monthly"
+            />
           </div>
         </div>
 
