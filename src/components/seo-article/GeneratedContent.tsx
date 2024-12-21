@@ -25,14 +25,28 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
     }
   };
 
-  // Function to extract and clean the HTML content from the code block
-  const extractHtmlContent = (content: string) => {
+  // Function to convert markdown-style content to HTML
+  const convertToHtml = (content: string) => {
     // Remove the markdown code block syntax if present
-    const htmlContent = content.replace(/```html\n|```/g, '');
+    let htmlContent = content.replace(/```html\n|```/g, '');
+    
+    // Convert markdown headings to HTML
+    htmlContent = htmlContent
+      .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+      .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+      .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n/g, '<br/>');
+
+    // Wrap the content in a paragraph tag if it doesn't start with a heading
+    if (!htmlContent.startsWith('<h')) {
+      htmlContent = `<p>${htmlContent}</p>`;
+    }
+
     // Sanitize the HTML content
     return DOMPurify.sanitize(htmlContent, { 
-      ADD_TAGS: ['a', 'h1', 'h2', 'h3', 'p', 'ul', 'ol', 'li', 'strong', 'img'],
-      ADD_ATTR: ['href', 'target', 'src', 'alt']
+      ADD_TAGS: ['h1', 'h2', 'h3', 'p', 'br'],
+      ADD_ATTR: []
     });
   };
 
@@ -49,8 +63,8 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
       </CardHeader>
       <CardContent>
         <div 
-          className="prose prose-sm max-w-none [&_a]:text-blue-600 [&_a]:underline hover:[&_a]:text-blue-800 [&_img]:max-w-full [&_img]:h-auto [&_h1]:text-2xl [&_h2]:text-xl [&_h3]:text-lg [&_ul]:list-disc [&_ol]:list-decimal [&_li]:ml-4"
-          dangerouslySetInnerHTML={{ __html: extractHtmlContent(content) }}
+          className="prose prose-sm max-w-none space-y-4 [&_h1]:text-2xl [&_h2]:text-xl [&_h3]:text-lg [&_p]:mb-4"
+          dangerouslySetInnerHTML={{ __html: convertToHtml(content) }}
         />
       </CardContent>
     </Card>
