@@ -48,8 +48,9 @@ IMPORTANT: Use straight double quotes (") instead of curly quotes. The correct f
 d) Replace [FULL_IMAGE_URL] with the complete URL of the image, and [DESCRIPTIVE_ALT_TEXT] with appropriate alt text.
 e) Ensure even distribution of images throughout the article.
 f) Provide a detailed description of each image's contents within the article text.
-g) Use anchor text that is relevant and descriptive.
-h) Aim for a mix of internal and external links to improve SEO value.
+g) When creating product links, use this exact format:
+<a href="[PRODUCT_URL]">[DESCRIPTIVE_TEXT]</a>
+IMPORTANT: Do not add any target="_blank" attributes or UTM parameters to the URLs. Use the product URLs exactly as provided.
 
 Writing Style and Content:
 a) Adhere to the tone and style guidelines outlined in the brand bible.
