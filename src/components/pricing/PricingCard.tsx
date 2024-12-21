@@ -20,6 +20,17 @@ interface PricingCardProps {
 export function PricingCard({ title, price, features, tier, duration }: PricingCardProps) {
   const { toast } = useToast();
 
+  const getBillingPeriod = () => {
+    switch (duration) {
+      case 'quarterly':
+        return '/quarter';
+      case 'yearly':
+        return '/year';
+      default:
+        return '/month';
+    }
+  };
+
   const handleSubscribe = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -62,7 +73,7 @@ export function PricingCard({ title, price, features, tier, duration }: PricingC
         <CardTitle className="text-2xl font-bold text-center">{title}</CardTitle>
         <div className="text-center">
           <span className="text-4xl font-bold">{price}</span>
-          <span className="text-muted-foreground">/month</span>
+          <span className="text-muted-foreground">{getBillingPeriod()}</span>
         </div>
       </CardHeader>
       <CardContent className="flex-grow">

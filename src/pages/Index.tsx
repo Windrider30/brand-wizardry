@@ -2,8 +2,23 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { BookOpen, MessageSquare, Mail, Tag, Target, FileText } from "lucide-react";
 import { PricingCard } from "@/components/pricing/PricingCard";
+import { DurationToggle } from "@/components/pricing/DurationToggle";
+import { useState } from "react";
 
 const Index = () => {
+  const [duration, setDuration] = useState<'monthly' | 'quarterly' | 'yearly'>('monthly');
+
+  const getPriceForDuration = (basePrice: number) => {
+    switch (duration) {
+      case 'quarterly':
+        return `$${(basePrice * 3 * 0.9).toFixed(0)}`; // 10% discount
+      case 'yearly':
+        return `$${(basePrice * 12 * 0.8).toFixed(0)}`; // 20% discount
+      default:
+        return `$${basePrice}`;
+    }
+  };
+
   const beginnerFeatures = [
     { name: "Brand Bibles", limit: 2 },
     { name: "Product Descriptions", limit: 25 },
@@ -90,20 +105,21 @@ const Index = () => {
         {/* Pricing Section */}
         <div className="mt-20">
           <h2 className="text-3xl font-bold mb-12">Choose Your Plan</h2>
+          <DurationToggle duration={duration} onDurationChange={setDuration} />
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <PricingCard
               title="Beginner"
-              price="$15"
+              price={getPriceForDuration(15)}
               features={beginnerFeatures}
               tier="beginner"
-              duration="monthly"
+              duration={duration}
             />
             <PricingCard
               title="Professional"
-              price="$25"
+              price={getPriceForDuration(25)}
               features={professionalFeatures}
               tier="professional"
-              duration="monthly"
+              duration={duration}
             />
           </div>
         </div>
