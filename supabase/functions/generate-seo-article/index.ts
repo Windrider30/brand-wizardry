@@ -44,13 +44,11 @@ ${imageAndProductUrlsSection}
 b) Integrate these images throughout the article where they are most relevant.
 c) Use the following format for embedding each image, which is compatible with Shopify:
 <img src="[FULL_IMAGE_URL]" alt="[DESCRIPTIVE_ALT_TEXT]" style="width:100%">
-IMPORTANT: Use straight double quotes (") instead of curly quotes. The correct format uses straight quotes like this: src="..." alt="..." style="..."
 d) Replace [FULL_IMAGE_URL] with the complete URL of the image, and [DESCRIPTIVE_ALT_TEXT] with appropriate alt text.
 e) Ensure even distribution of images throughout the article.
 f) Provide a detailed description of each image's contents within the article text.
 g) When creating product links, use this exact format:
 <a href="[PRODUCT_URL]">[DESCRIPTIVE_TEXT]</a>
-IMPORTANT: Do not add any target="_blank" attributes or UTM parameters to the URLs. Use the product URLs exactly as provided.
 
 Writing Style and Content:
 a) Adhere to the tone and style guidelines outlined in the brand bible.
@@ -66,21 +64,10 @@ a) Summarize the key points of the article.
 b) Include a call-to-action that aligns with the brand's goals.
 
 Article Excerpt:
-Write a 100-word excerpt that captures the essence of the article. This excerpt should be engaging and informative, encouraging readers to continue reading the full article.
+Write a 100-word excerpt that captures the essence of the article. This excerpt should be engaging and informative, encouraging readers to continue reading the full article.`;
 
-Output Format:
-Present your article as properly formatted HTML, including:
-- A <title> tag with the SEO-optimized title
-- A <meta name="description"> tag with the meta description
-- Proper use of heading tags (h1, h2, h3, etc.)
-- Paragraphs wrapped in <p> tags
-- Images inserted using <img> tags with appropriate alt text
-- Links using <a> tags with descriptive anchor text
-- Use of <ul>, <ol>, and <li> tags for lists
-- The 100-word excerpt in a <div> with a class="article-excerpt"
-
-IMPORTANT: Do not include any meta-commentary or notes about the article at the end. The content should end with the article's conclusion and call-to-action.`;
-
+    console.log('Sending request to OpenAI...');
+    
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -92,7 +79,7 @@ IMPORTANT: Do not include any meta-commentary or notes about the article at the 
         messages: [
           {
             role: "system",
-            content: "You are an expert SEO content writer who creates engaging, well-structured articles that incorporate products and images naturally while maintaining brand voice and SEO best practices. You MUST generate articles that are approximately 1,500 words long. Do not include any meta-commentary or notes about the article structure at the end of your response."
+            content: "You are an expert SEO content writer who creates engaging, well-structured articles that incorporate products and images naturally while maintaining brand voice and SEO best practices. You MUST generate articles that are approximately 1,500 words long."
           },
           {
             role: "user",
@@ -104,25 +91,38 @@ IMPORTANT: Do not include any meta-commentary or notes about the article at the 
       }),
     });
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('OpenAI API error:', errorData);
+      throw new Error(`OpenAI API error: ${JSON.stringify(errorData)}`);
+    }
+
     const data = await response.json();
     console.log('OpenAI Response:', data);
     
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${JSON.stringify(data)}`);
+    if (!data.choices?.[0]?.message?.content) {
+      console.error('No content in OpenAI response:', data);
+      throw new Error('OpenAI did not generate any content');
     }
     
-    let generatedContent = data.choices[0].message.content;
+    const generatedContent = data.choices[0].message.content;
     
     // Remove any trailing meta-commentary that might appear after the HTML content
-    generatedContent = generatedContent.replace(/```[\s\S]*$/, '');
-    generatedContent = generatedContent.replace(/This HTML document[\s\S]*$/, '');
+    const cleanedContent = generatedContent
+      .replace(/```[\s\S]*$/, '')
+      .replace(/This HTML document[\s\S]*$/, '');
     
-    return new Response(JSON.stringify({ content: generatedContent }), {
+    console.log('Generated content length:', cleanedContent.length);
+    
+    return new Response(JSON.stringify({ content: cleanedContent }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
     console.error('Error in generate-seo-article function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ 
+      error: error instanceof Error ? error.message : 'An unexpected error occurred',
+      details: error instanceof Error ? error.stack : undefined
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
