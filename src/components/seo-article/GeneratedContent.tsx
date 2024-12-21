@@ -32,8 +32,8 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       
+      // Handle image URLs
       if (line.match(/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)/i)) {
-        // This is an image URL
         elements.push(
           <img 
             key={`img-${i}`}
@@ -43,8 +43,9 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
             loading="lazy" 
           />
         );
-      } else if (line.match(/^https?:\/\/.*\/products\//)) {
-        // This is a product URL
+      } 
+      // Handle product URLs
+      else if (line.match(/^https?:\/\/.*\/products\//)) {
         elements.push(
           <a 
             key={`link-${i}`}
@@ -56,25 +57,51 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
             {line}
           </a>
         );
-      } else if (line.startsWith('# ')) {
+      } 
+      // Handle h1 headers
+      else if (line.startsWith('# ')) {
         elements.push(
           <h1 key={`h1-${i}`} className="text-3xl font-bold mb-4">
             {line.replace('# ', '')}
           </h1>
         );
-      } else if (line.startsWith('## ')) {
+      } 
+      // Handle h2 headers
+      else if (line.startsWith('## ')) {
         elements.push(
           <h2 key={`h2-${i}`} className="text-2xl font-bold mb-3">
             {line.replace('## ', '')}
           </h2>
         );
-      } else if (line.startsWith('### ')) {
+      } 
+      // Handle h3 headers
+      else if (line.startsWith('### ')) {
         elements.push(
           <h3 key={`h3-${i}`} className="text-xl font-bold mb-2">
             {line.replace('### ', '')}
           </h3>
         );
-      } else if (line.length > 0) {
+      }
+      // Handle markdown links [text](url)
+      else if (line.match(/\[.*?\]\(.*?\)/)) {
+        const linkMatches = line.match(/\[(.*?)\]\((.*?)\)/);
+        if (linkMatches) {
+          const [fullMatch, text, url] = linkMatches;
+          elements.push(
+            <a
+              key={`mdlink-${i}`}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline block mb-4"
+            >
+              {text}
+            </a>
+          );
+        }
+      }
+      // Handle regular paragraphs
+      else if (line.length > 0) {
         elements.push(
           <p key={`p-${i}`} className="mb-4">
             {line}
