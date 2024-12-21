@@ -11,14 +11,14 @@ interface GeneratedContentProps {
 export function GeneratedContent({ content }: GeneratedContentProps) {
   const handleCopy = async () => {
     try {
-      // First, extract meta description and excerpt
-      const metaMatch = content.match(/Meta Description:(.*?)(?=\n\n|\n#|$)/s);
-      const excerptMatch = content.match(/Excerpt:(.*?)(?=\n\n|\n#|$)/s);
+      // Extract meta description and excerpt
+      const metaMatch = content.match(/Meta Description:\s*([^\n]+)/);
+      const excerptMatch = content.match(/Excerpt:\s*([^\n]+(?:\n[^\n]+)*)/);
       
-      // Remove meta and excerpt from main content
+      // Remove meta and excerpt from main content for processing
       let mainContent = content
-        .replace(/Meta Description:.*?(?=\n\n|\n#|$)/s, '')
-        .replace(/Excerpt:.*?(?=\n\n|\n#|$)/s, '')
+        .replace(/Meta Description:.*$/m, '')
+        .replace(/Excerpt:.*$/m, '')
         .trim();
 
       // Convert main content to HTML
@@ -36,20 +36,20 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         .replace(/^(?!<[uo]l|<li|<h[1-6]|<img|<a)(.*$)/gm, '<p>$1</p>')
         .replace(/\n\n/g, '\n');
 
-      // Add SEO information section at the end if meta or excerpt exists
+      // Add SEO information section at the end
       if (metaMatch?.[1] || excerptMatch?.[1]) {
-        htmlContent += '\n<div style="margin-top: 40px; padding: 20px; border: 2px solid #0EA5E9; border-radius: 8px; background-color: #f8fafc;">';
+        htmlContent += '\n<div class="seo-info" style="margin-top: 40px; padding: 20px; background-color: #f8fafc; border: 2px solid #0EA5E9; border-radius: 8px;">';
         htmlContent += '\n<h2 style="color: #0EA5E9; margin-bottom: 20px;">SEO Information</h2>';
         
         if (metaMatch?.[1]) {
-          htmlContent += `\n<div style="margin-bottom: 20px;">
+          htmlContent += `\n<div class="meta-description" style="margin-bottom: 20px;">
             <h3 style="color: #0EA5E9; margin-bottom: 10px;">Meta Description:</h3>
             <p style="color: #374151; line-height: 1.6;">${metaMatch[1].trim()}</p>
           </div>`;
         }
         
         if (excerptMatch?.[1]) {
-          htmlContent += `\n<div>
+          htmlContent += `\n<div class="excerpt">
             <h3 style="color: #0EA5E9; margin-bottom: 10px;">Excerpt:</h3>
             <p style="color: #374151; line-height: 1.6;">${excerptMatch[1].trim()}</p>
           </div>`;
@@ -64,6 +64,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         description: "Article copied to clipboard as HTML with proper formatting",
       });
     } catch (err) {
+      console.error('Error copying content:', err);
       toast({
         title: "Error",
         description: "Failed to copy to clipboard",
@@ -88,6 +89,27 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
           <ReactMarkdown>
             {content}
           </ReactMarkdown>
+          {content.includes('Meta Description:') || content.includes('Excerpt:') && (
+            <div className="mt-10 p-6 bg-gray-50 border-2 border-[#0EA5E9] rounded-lg">
+              <h2 className="text-[#0EA5E9] text-xl font-bold mb-4">SEO Information</h2>
+              {content.includes('Meta Description:') && (
+                <div className="mb-6">
+                  <h3 className="text-[#0EA5E9] font-bold mb-2">Meta Description:</h3>
+                  <p className="text-gray-700">
+                    {content.match(/Meta Description:\s*([^\n]+)/)?.[1]}
+                  </p>
+                </div>
+              )}
+              {content.includes('Excerpt:') && (
+                <div>
+                  <h3 className="text-[#0EA5E9] font-bold mb-2">Excerpt:</h3>
+                  <p className="text-gray-700">
+                    {content.match(/Excerpt:\s*([^\n]+(?:\n[^\n]+)*)/)?.[1]}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
