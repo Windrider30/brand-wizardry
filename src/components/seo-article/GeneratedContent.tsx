@@ -31,8 +31,8 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
     const htmlContent = content.replace(/```html\n|```/g, '');
     // Sanitize the HTML content
     return DOMPurify.sanitize(htmlContent, { 
-      ADD_TAGS: ['a'],
-      ADD_ATTR: ['href', 'target']
+      ADD_TAGS: ['a', 'h1', 'h2', 'h3', 'p', 'ul', 'ol', 'li', 'strong', 'img'],
+      ADD_ATTR: ['href', 'target', 'src', 'alt']
     });
   };
 
@@ -49,7 +49,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
       </CardHeader>
       <CardContent>
         <div 
-          className="prose prose-sm max-w-none"
+          className="prose prose-sm max-w-none [&_a]:text-blue-600 [&_a]:underline hover:[&_a]:text-blue-800 [&_img]:max-w-full [&_img]:h-auto [&_h1]:text-2xl [&_h2]:text-xl [&_h3]:text-lg [&_ul]:list-disc [&_ol]:list-decimal [&_li]:ml-4"
           dangerouslySetInnerHTML={{ __html: extractHtmlContent(content) }}
         />
       </CardContent>
