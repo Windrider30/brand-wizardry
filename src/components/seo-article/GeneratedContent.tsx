@@ -4,6 +4,7 @@ import { Copy } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { ContentItem } from "./ContentItem";
 import { parseContent } from "./contentParser";
+import ReactMarkdown from 'react-markdown';
 
 interface GeneratedContentProps {
   content: string;
@@ -40,16 +41,8 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="prose prose-sm max-w-none">
-          {parsedContent.map((item, index) => (
-            <ContentItem
-              key={index}
-              type={item.type}
-              content={item.content}
-              url={item.url}
-              linkText={item.linkText}
-            />
-          ))}
+        <div className="prose prose-sm max-w-none dark:prose-invert">
+          <ReactMarkdown>{content}</ReactMarkdown>
         </div>
       </CardContent>
     </Card>
