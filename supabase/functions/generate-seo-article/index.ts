@@ -24,18 +24,18 @@ serve(async (req) => {
     let urlsSection = '';
     if (productUrls?.length > 0) {
       urlsSection += '\nProduct URLs:\n';
-      productUrls.forEach((url: string, index: number) => {
+      productUrls.forEach((url: string) => {
         urlsSection += `${url}\n`;
       });
     }
     if (imageUrls?.length > 0) {
       urlsSection += '\nImage URLs:\n';
-      imageUrls.forEach((url: string, index: number) => {
+      imageUrls.forEach((url: string) => {
         urlsSection += `${url}\n`;
       });
     }
 
-    const prompt = `You are tasked with creating a high-quality, SEO-optimized article. The article should be informative, engaging, and aligned with the provided brand voice. When referencing products, use the plain URLs provided - do not wrap them in HTML tags.
+    const prompt = `You are tasked with creating a high-quality, SEO-optimized article. The article should be informative, engaging, and aligned with the provided brand voice. When referencing products, use the EXACT URLs provided - do not modify them or add any tracking parameters.
 
 Brand Voice Guidelines:
 ${brandBible}
@@ -49,10 +49,11 @@ ${urlsSection}
 
 Important Instructions:
 1. Write an engaging, SEO-optimized article of approximately 1,500 words
-2. When mentioning products, use the plain URLs directly - do not create HTML links
+2. When mentioning products, use the EXACT URLs provided - do not add any UTM parameters or modify the URLs in any way
 3. Structure the content with clear headings and paragraphs
 4. Naturally incorporate the keywords throughout the text
 5. Make the content informative and valuable to readers
+6. Include the exact product URLs as provided without any modifications
 
 Return the article in plain text format, using standard markdown-style formatting for headings (# for h1, ## for h2, etc).`;
 
@@ -69,7 +70,7 @@ Return the article in plain text format, using standard markdown-style formattin
         messages: [
           {
             role: "system",
-            content: "You are an expert SEO content writer. Generate articles in plain text format, using URLs directly without HTML formatting."
+            content: "You are an expert SEO content writer. Generate articles in plain text format, using URLs exactly as provided without adding any tracking parameters."
           },
           {
             role: "user",
