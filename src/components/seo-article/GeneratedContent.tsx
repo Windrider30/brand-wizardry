@@ -36,9 +36,10 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="prose prose-sm max-w-none">
-          <div dangerouslySetInnerHTML={{ __html: content }} />
-        </div>
+        <div 
+          className="prose prose-sm max-w-none"
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
       </CardContent>
     </Card>
   );

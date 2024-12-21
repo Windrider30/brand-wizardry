@@ -32,14 +32,18 @@ export default function SeoArticle() {
     
     try {
       const result = await generateSeoArticle(formData);
-      if (result) {
+      console.log("Generated content:", result); // Add this log to debug
+      if (result && result.content) {
         setGeneratedContent(result.content);
         toast({
           title: "Content Generated",
           description: "Your SEO article has been generated successfully!",
         });
+      } else {
+        throw new Error("No content received from the API");
       }
     } catch (error) {
+      console.error("Error generating SEO article:", error);
       toast({
         title: "Error",
         description: "Failed to generate SEO article. Please try again.",
