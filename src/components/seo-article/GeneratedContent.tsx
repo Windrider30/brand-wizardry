@@ -40,7 +40,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="prose prose-sm max-w-none space-y-4">
+        <div className="prose prose-sm max-w-none">
           {parsedContent.map((item, index) => (
             <ContentItem
               key={index}

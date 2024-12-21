@@ -7,7 +7,7 @@ interface ParsedContent {
 
 export function parseContent(content: string): ParsedContent[] {
   const lines = content.split('\n');
-  return lines.map((line, index) => {
+  return lines.map((line) => {
     const trimmedLine = line.trim();
     
     if (!trimmedLine) return null;
@@ -20,22 +20,29 @@ export function parseContent(content: string): ParsedContent[] {
       };
     }
     
-    // Handle product URLs
+    // Handle product URLs (both plain URLs and markdown format)
+    const markdownLinkMatch = trimmedLine.match(/\[(.*?)\]\((.*?)\)/);
+    if (markdownLinkMatch) {
+      const [_, linkText, url] = markdownLinkMatch;
+      if (url.includes('/products/')) {
+        return {
+          type: 'product-link',
+          content: url,
+          linkText: linkText
+        };
+      }
+      return {
+        type: 'markdown-link',
+        content: trimmedLine,
+        linkText: linkText,
+        url: url
+      };
+    }
+    
     if (trimmedLine.match(/^https?:\/\/.*\/products\//)) {
       return {
         type: 'product-link',
         content: trimmedLine
-      };
-    }
-    
-    // Handle markdown links [text](url)
-    const linkMatch = trimmedLine.match(/\[(.*?)\]\((.*?)\)/);
-    if (linkMatch) {
-      return {
-        type: 'markdown-link',
-        content: trimmedLine,
-        linkText: linkMatch[1],
-        url: linkMatch[2]
       };
     }
     

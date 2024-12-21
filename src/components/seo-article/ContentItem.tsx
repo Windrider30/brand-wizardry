@@ -27,7 +27,7 @@ export function ContentItem({ type, content, url, linkText }: ContentItemProps) 
           rel="noopener noreferrer"
           className="text-primary hover:underline block mb-4"
         >
-          {content}
+          {linkText || content}
         </a>
       );
     
