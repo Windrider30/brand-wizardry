@@ -123,7 +123,7 @@
   }
   
   .seo-article-content a {
-    @apply text-primary no-underline font-medium hover:underline;
+    @apply text-[#0EA5E9] no-underline font-medium transition-colors hover:text-[#0284C7];
   }
   
   .seo-article-content img {
@@ -137,5 +137,10 @@
   
   .seo-article-content li {
     @apply my-2;
+  }
+
+  .seo-article-content .meta-description,
+  .seo-article-content .excerpt {
+    @apply my-4 p-4 bg-gray-50 rounded-lg border border-gray-200;
   }
 }
