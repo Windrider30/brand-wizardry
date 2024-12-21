@@ -13,12 +13,13 @@ serve(async (req) => {
 
   try {
     const { brandBible, title, keywords, productUrls, imageUrls } = await req.json();
+    console.log('Received request with:', { brandBible, title, keywords, productUrls, imageUrls });
 
     // Create the image and product URLs section
     let imageAndProductUrlsSection = '';
-    const maxUrls = Math.max(imageUrls.length, productUrls.length);
+    const maxUrls = Math.max(imageUrls?.length || 0, productUrls?.length || 0);
     for (let i = 0; i < maxUrls; i++) {
-      imageAndProductUrlsSection += `[${i + 1}] Image: ${imageUrls[i] || ''}\nProduct: ${productUrls[i] || ''}\n\n`;
+      imageAndProductUrlsSection += `[${i + 1}] Image: ${imageUrls?.[i] || ''}\nProduct: ${productUrls?.[i] || ''}\n\n`;
     }
 
     const prompt = `You are tasked with creating a high-quality, SEO-optimized HTML article that will rank well on Google. This article should be informative, engaging, and aligned with the provided brand voice. Follow these instructions carefully to produce the desired content:
@@ -29,7 +30,7 @@ ${brandBible}
 </brand_bible>
 
 Article Structure and SEO Optimization:
-a) Create a compelling title that includes the main keyword${title ? ` (use this title if provided: ${title})` : ''}${keywords.length > 0 ? ` and optimize for these keywords: ${keywords.join(', ')}` : ''}.
+a) Create a compelling title that includes the main keyword${title ? ` (use this title if provided: ${title})` : ''}${keywords?.length > 0 ? ` and optimize for these keywords: ${keywords.join(', ')}` : ''}.
 b) Write a meta description of about 150-160 characters that summarizes the article and entices readers to click.
 c) Divide the content into logical sections with appropriate H2 and H3 headings.
 d) Include the main keyword in the first paragraph and use related keywords throughout the article naturally.
@@ -38,33 +39,19 @@ f) Use bullet points or numbered lists where appropriate to improve readability.
 g) Keep the title at no more than 70 characters in length.
 
 Incorporating Images and Product Links:
-a) Embed the images and link to product pages using the following information:
 ${imageAndProductUrlsSection}
-
-b) Integrate these images throughout the article where they are most relevant.
-c) Use the following format for embedding each image, which is compatible with Shopify:
-<img src="[FULL_IMAGE_URL]" alt="[DESCRIPTIVE_ALT_TEXT]" style="width:100%">
-d) Replace [FULL_IMAGE_URL] with the complete URL of the image, and [DESCRIPTIVE_ALT_TEXT] with appropriate alt text.
-e) Ensure even distribution of images throughout the article.
-f) Provide a detailed description of each image's contents within the article text.
-g) When creating product links, use this exact format:
-<a href="[PRODUCT_URL]">[DESCRIPTIVE_TEXT]</a>
 
 Writing Style and Content:
 a) Adhere to the tone and style guidelines outlined in the brand bible.
 b) Use the appropriate level of formality, humor, or technical language as specified.
 c) Maintain consistency in voice throughout the article.
-d) The article MUST be approximately 1,500 words long. This is a strict requirement - do not generate less content.
+d) The article MUST be approximately 1,500 words long.
 e) Provide in-depth, valuable information on the topic.
 f) Include practical examples, case studies, or data points to support your arguments.
 g) Address potential questions or concerns the reader might have about the topic.
 
-Conclusion:
-a) Summarize the key points of the article.
-b) Include a call-to-action that aligns with the brand's goals.
-
-Article Excerpt:
-Write a 100-word excerpt that captures the essence of the article. This excerpt should be engaging and informative, encouraging readers to continue reading the full article.`;
+Format the article in HTML, using appropriate tags for headings, paragraphs, lists, and other elements.
+Return ONLY the HTML content, no additional commentary or metadata.`;
 
     console.log('Sending request to OpenAI...');
     
@@ -79,7 +66,7 @@ Write a 100-word excerpt that captures the essence of the article. This excerpt 
         messages: [
           {
             role: "system",
-            content: "You are an expert SEO content writer who creates engaging, well-structured articles that incorporate products and images naturally while maintaining brand voice and SEO best practices. You MUST generate articles that are approximately 1,500 words long."
+            content: "You are an expert SEO content writer who creates engaging, well-structured articles that incorporate products and images naturally while maintaining brand voice and SEO best practices."
           },
           {
             role: "user",
@@ -98,7 +85,7 @@ Write a 100-word excerpt that captures the essence of the article. This excerpt 
     }
 
     const data = await response.json();
-    console.log('OpenAI Response:', data);
+    console.log('Received response from OpenAI:', data);
     
     if (!data.choices?.[0]?.message?.content) {
       console.error('No content in OpenAI response:', data);
@@ -106,15 +93,9 @@ Write a 100-word excerpt that captures the essence of the article. This excerpt 
     }
     
     const generatedContent = data.choices[0].message.content;
+    console.log('Generated content length:', generatedContent.length);
     
-    // Remove any trailing meta-commentary that might appear after the HTML content
-    const cleanedContent = generatedContent
-      .replace(/```[\s\S]*$/, '')
-      .replace(/This HTML document[\s\S]*$/, '');
-    
-    console.log('Generated content length:', cleanedContent.length);
-    
-    return new Response(JSON.stringify({ content: cleanedContent }), {
+    return new Response(JSON.stringify({ content: generatedContent }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
