@@ -1,52 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { BookOpen, MessageSquare, Mail, Tag, Target, FileText } from "lucide-react";
+import { useState } from "react";
+import { FeaturesGrid } from "@/components/home/FeaturesGrid";
 import { PricingCard } from "@/components/pricing/PricingCard";
 import { DurationToggle } from "@/components/pricing/DurationToggle";
-import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { CancelSubscription } from "@/components/home/CancelSubscription";
 
 const Index = () => {
   const [duration, setDuration] = useState<'monthly' | 'quarterly' | 'yearly'>('monthly');
-  const { toast } = useToast();
-
-  const handleCancelSubscription = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        toast({
-          title: "Authentication required",
-          description: "Please log in to cancel your subscription",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const response = await supabase.functions.invoke('cancel-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (response.error) {
-        throw new Error(response.error.message);
-      }
-
-      toast({
-        title: "Success",
-        description: "Your subscription has been cancelled successfully",
-      });
-    } catch (error) {
-      console.error('Error cancelling subscription:', error);
-      toast({
-        title: "Error",
-        description: "Failed to cancel subscription. Please try again or contact support.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const getPriceForDuration = (basePrice: number) => {
     if (basePrice === 15) { // Beginner tier
@@ -97,61 +56,7 @@ const Index = () => {
           Create your brand bible and generate on-brand content using the power of AI
         </p>
         
-        <div className="grid gap-4 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 max-w-6xl mx-auto mt-8">
-          <div className="p-4 md:p-6 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
-            <BookOpen className="w-8 h-8 md:w-12 md:h-12 text-[#0EA5E9] mx-auto mb-3 md:mb-4" />
-            <h2 className="text-lg md:text-xl font-semibold mb-2 text-[#0EA5E9]">Brand Bible</h2>
-            <p className="text-base md:text-lg text-black mb-4">Define your brand's voice, values, and vision</p>
-            <Link to="/brand-bible" className="block">
-              <Button variant="outline" className="w-full text-base md:text-lg border-black">Get Started</Button>
-            </Link>
-          </div>
-
-          <div className="p-4 md:p-6 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
-            <Tag className="w-8 h-8 md:w-12 md:h-12 text-[#0EA5E9] mx-auto mb-3 md:mb-4" />
-            <h2 className="text-lg md:text-xl font-semibold mb-2 text-[#0EA5E9]">Product Descriptions</h2>
-            <p className="text-base md:text-lg text-black mb-4">Generate compelling product content</p>
-            <Link to="/product-description" className="block">
-              <Button variant="outline" className="w-full text-base md:text-lg border-black">Get Started</Button>
-            </Link>
-          </div>
-
-          <div className="p-4 md:p-6 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
-            <MessageSquare className="w-8 h-8 md:w-12 md:h-12 text-[#0EA5E9] mx-auto mb-3 md:mb-4" />
-            <h2 className="text-lg md:text-xl font-semibold mb-2 text-[#0EA5E9]">Social Posts</h2>
-            <p className="text-base md:text-lg text-black mb-4">Generate content for Facebook, Instagram, and Pinterest</p>
-            <Link to="/social-posts" className="block">
-              <Button variant="outline" className="w-full text-base md:text-lg border-black">Get Started</Button>
-            </Link>
-          </div>
-
-          <div className="p-4 md:p-6 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
-            <Mail className="w-8 h-8 md:w-12 md:h-12 text-[#0EA5E9] mx-auto mb-3 md:mb-4" />
-            <h2 className="text-lg md:text-xl font-semibold mb-2 text-[#0EA5E9]">Email Content</h2>
-            <p className="text-base md:text-lg text-black mb-4">Create compelling email campaigns</p>
-            <Link to="/email-content" className="block">
-              <Button variant="outline" className="w-full text-base md:text-lg border-black">Get Started</Button>
-            </Link>
-          </div>
-
-          <div className="p-4 md:p-6 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
-            <Target className="w-8 h-8 md:w-12 md:h-12 text-[#0EA5E9] mx-auto mb-3 md:mb-4" />
-            <h2 className="text-lg md:text-xl font-semibold mb-2 text-[#0EA5E9]">Ad Generation</h2>
-            <p className="text-base md:text-lg text-black mb-4">Create Facebook and Instagram ads</p>
-            <Link to="/ad-generation" className="block">
-              <Button variant="outline" className="w-full text-base md:text-lg border-black">Get Started</Button>
-            </Link>
-          </div>
-
-          <div className="p-4 md:p-6 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
-            <FileText className="w-8 h-8 md:w-12 md:h-12 text-[#0EA5E9] mx-auto mb-3 md:mb-4" />
-            <h2 className="text-lg md:text-xl font-semibold mb-2 text-[#0EA5E9]">SEO Articles</h2>
-            <p className="text-base md:text-lg text-black mb-4">Generate optimized content for your blog</p>
-            <Link to="/seo-article" className="block">
-              <Button variant="outline" className="w-full text-base md:text-lg border-black">Get Started</Button>
-            </Link>
-          </div>
-        </div>
+        <FeaturesGrid />
 
         {/* Pricing Section */}
         <div className="mt-20">
@@ -175,19 +80,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Cancel Subscription Section */}
-        <div className="mt-8">
-          <Button
-            variant="outline"
-            className="text-red-500 hover:text-red-600 border-red-500 hover:border-red-600"
-            onClick={handleCancelSubscription}
-          >
-            Cancel Subscription
-          </Button>
-          <p className="text-sm text-gray-500 mt-2">
-            No lock-in contracts. Cancel anytime.
-          </p>
-        </div>
+        <CancelSubscription />
 
         <div className="mt-12 md:mt-16 text-xs md:text-sm text-gray-500">
           Powered by EcomCavalry
