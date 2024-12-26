@@ -18,17 +18,17 @@ export async function generateBrandBible(brandInfo: {
       body: {
         messages: [{
           role: "user",
-          content: `I need a brand bible for the following brand:
+          content: `Create a comprehensive brand bible for:
             Brand Name: ${brandInfo.name}
             Product/Service: ${brandInfo.product}
             Desired Vibe: ${brandInfo.vibe}
             Brand Style: ${brandInfo.brandStyle}
             
-            Please provide a comprehensive brand bible including:
-            - Tagline
-            - Mission Statement
-            - Vision Statement
-            - Core Values (at least 5)`
+            Include these sections with clear headings:
+            1. Basic Brand Bible (including tagline, mission statement, vision statement, and core values)
+            2. Target Market Analysis (including demographics, psychographics, behavioral insights, and pain points)
+            3. Brand Voice (including voice framework, tagline options, archetypes, and tone examples)
+            4. Buyer & Negative Personas (including detailed buyer and negative personas)`
         }],
         persona: "dr_brand"
       }

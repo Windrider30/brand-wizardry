@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { cleanResponse } from "./cleanResponse.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,11 +26,6 @@ serve(async (req) => {
 
     console.log('Sending request to OpenAI with messages:', JSON.stringify(messages));
 
-    const systemPrompt = `You are ${persona}, an AI assistant specialized in brand development and marketing content generation. 
-    Format your responses in plain text without Markdown symbols (no #, **, or - symbols). 
-    Use clear headings and spacing for readability. 
-    For lists, use numbers or letters followed by a period.`;
-
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -41,15 +37,12 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: systemPrompt
+            content: `You are ${persona}, an AI assistant specialized in brand development and marketing content generation. Format your responses in clear sections with proper spacing. Do not use any special formatting symbols.`
           },
-          ...messages.map(msg => ({
-            ...msg,
-            content: msg.role === 'user' ? 
-              msg.content + "\n\nPlease format the response in plain text without any Markdown symbols (*, #, -, etc). Use clear headings and spacing for readability." : 
-              msg.content
-          }))
+          ...messages
         ],
+        temperature: 0.7,
+        max_tokens: 2500,
       }),
     });
 
@@ -66,8 +59,10 @@ serve(async (req) => {
       throw new Error('Invalid response format from OpenAI');
     }
 
+    const cleanedContent = cleanResponse(data.choices[0].message.content);
+
     return new Response(JSON.stringify({
-      choices: [{ message: { content: data.choices[0].message.content } }]
+      choices: [{ message: { content: cleanedContent } }]
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
