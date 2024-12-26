@@ -1,49 +1,56 @@
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
-import {
-  generateDrBrandContent,
-  generateJunoContent,
-  generateMissDodgeContent,
-  generateDemetriusContent,
-} from "./openaiService";
 
-interface BrandInfo {
+export async function generateBrandBible(brandInfo: {
   name: string;
   product: string;
   vibe: string;
   brandStyle: string;
-}
-
-export async function generateBrandBible(brandInfo: BrandInfo) {
+}) {
   try {
-    // Step 1: Generate basic brand bible with Dr. Brand
-    const basicBrandBible = await generateDrBrandContent(brandInfo);
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session?.access_token) {
+      throw new Error('No session found. Please log in.');
+    }
+    
+    const response = await supabase.functions.invoke('openai', {
+      body: {
+        messages: [{
+          role: "user",
+          content: `I need a brand bible for the following brand:
+            Brand Name: ${brandInfo.name}
+            Product/Service: ${brandInfo.product}
+            Desired Vibe: ${brandInfo.vibe}
+            Brand Style: ${brandInfo.brandStyle}
+            
+            Please provide a comprehensive brand bible including:
+            - Tagline
+            - Mission Statement
+            - Vision Statement
+            - Core Values (at least 5)`
+        }],
+        persona: "dr_brand"
+      }
+    });
 
-    // Step 2: Generate target market analysis with Juno
-    const targetMarketAnalysis = await generateJunoContent(basicBrandBible);
+    if (response.error) {
+      console.error("OpenAI API Error:", response.error);
+      throw new Error(response.error.message || "Failed to generate content");
+    }
 
-    // Step 3: Generate brand voice with Miss Dodge
-    const brandVoice = await generateMissDodgeContent(
-      `${basicBrandBible}\n\n${targetMarketAnalysis}`
-    );
+    if (!response.data?.choices?.[0]?.message?.content) {
+      throw new Error("Invalid response format from OpenAI");
+    }
 
-    // Step 4: Generate personas with Demetrius
-    const personas = await generateDemetriusContent(
-      `${basicBrandBible}\n\n${targetMarketAnalysis}\n\n${brandVoice}`
-    );
-
-    return {
-      basicBrandBible,
-      targetMarketAnalysis,
-      brandVoice,
-      personas,
-    };
+    return response.data.choices[0].message.content;
   } catch (error) {
     console.error("Error generating brand bible:", error);
     toast({
       title: "Error",
-      description: "Failed to generate brand bible. Please try again.",
+      description: "Failed to generate brand bible. Please try again later.",
       variant: "destructive",
     });
-    return null;
+    throw error;
   }
 }

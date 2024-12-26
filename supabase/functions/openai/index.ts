@@ -12,60 +12,61 @@ serve(async (req) => {
   }
 
   try {
-    const { brandBible, name, features } = await req.json();
+    const { messages, persona } = await req.json();
+    
+    if (!messages || !Array.isArray(messages)) {
+      throw new Error('Invalid messages format');
+    }
 
-    const prompt = `Solaire,please give me a better SEO title than what I currently have make sure that the title is between 60 to no more than 70 characters in lenght, please be sure to use my brand voice when making the title
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
 
-Title: ${name}
-SEO Marketing Hooks Make sure to use one of the emotional pain points in the marking hook(Three unique options)
-SEO Descriptions Three unique options, each unique and be between 200 to 300 words and have two paragraphs make sure to use ONLY the title: ${name}
-Meta Description: Must be no longer than 160 characters in length 
-Product Title: ${name}
-Product Information: ${features}
-
-Instructions:
-Use the brand voice from the provided brand bible
-Pain Points: Address all five target market pain points with impact but subtly. The product should be the only solution and feel like a reward.
-SEO Description: Each description must be at least two paragraphs long and should not exceed 300 words.
-Avoid Words: Avoid using "Functional," "Versatile," "Whimsical," or any variations of these terms.
-Meta Description: Create a meta description no more than 175 characters long, aligning with the brand voice.
-
-Brand Bible Context:
-${brandBible}
-
-Format the response in clear sections with headers.`;
+    console.log('Sending request to OpenAI with messages:', JSON.stringify(messages));
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: 'gpt-4o-mini',
         messages: [
           {
-            role: "system",
-            content: "You are Solaire, an expert in crafting compelling product descriptions and marketing content that resonates with target audiences."
+            role: 'system',
+            content: `You are ${persona}, an AI assistant specialized in brand development and marketing content generation.`
           },
-          {
-            role: "user",
-            content: prompt
-          }
+          ...messages
         ],
       }),
     });
 
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      console.error('OpenAI API error:', errorData);
+      throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+    }
+
     const data = await response.json();
     
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Unexpected OpenAI response format:', data);
+      throw new Error('Invalid response format from OpenAI');
+    }
+
     return new Response(JSON.stringify({
-      content: data.choices[0].message.content
+      choices: [{ message: { content: data.choices[0].message.content } }]
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+
   } catch (error) {
-    console.error('Error in Solaire function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error('Error in OpenAI function:', error);
+    return new Response(JSON.stringify({ 
+      error: error.message || 'An error occurred while processing your request'
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
