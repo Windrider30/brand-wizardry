@@ -16,7 +16,15 @@ serve(async (req) => {
   }
 
   try {
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
+
     const { brandBible, platform, productUrl, productTitle, productDescription } = await req.json();
+
+    if (!brandBible || !platform) {
+      throw new Error('Missing required fields');
+    }
 
     // Create a thread
     const threadResponse = await fetch('https://api.openai.com/v1/threads', {
@@ -24,9 +32,15 @@ serve(async (req) => {
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
-        'OpenAI-Beta': 'assistants=v2'
+        'OpenAI-Beta': 'assistants=v1'
       }
     });
+
+    if (!threadResponse.ok) {
+      const error = await threadResponse.text();
+      console.error('Thread creation failed:', error);
+      throw new Error('Failed to create thread');
+    }
     
     const thread = await threadResponse.json();
     console.log('Thread created:', thread);
@@ -36,20 +50,26 @@ serve(async (req) => {
       `Product URL: ${productUrl}` : 
       `Product Title: ${productTitle}\nProduct Description: ${productDescription}`;
 
-    const messageContent = `Dennis I need a social media post for ${platform}. Please use my brand voice when writing the post, use all relevant hashtags. The post will be for the following product:\n\n${productInfo}\n\nHere is my brand bible for reference:\n${brandBible}`;
+    const messageContent = `Generate a social media post for ${platform}. Use my brand voice when writing the post, and include relevant hashtags. The post will be for the following product:\n\n${productInfo}\n\nHere is my brand bible for reference:\n${brandBible}`;
 
     const messageResponse = await fetch(`https://api.openai.com/v1/threads/${thread.id}/messages`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
-        'OpenAI-Beta': 'assistants=v2'
+        'OpenAI-Beta': 'assistants=v1'
       },
       body: JSON.stringify({
         role: 'user',
         content: messageContent
       })
     });
+
+    if (!messageResponse.ok) {
+      const error = await messageResponse.text();
+      console.error('Message creation failed:', error);
+      throw new Error('Failed to create message');
+    }
     
     console.log('Message added to thread');
 
@@ -59,12 +79,18 @@ serve(async (req) => {
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
-        'OpenAI-Beta': 'assistants=v2'
+        'OpenAI-Beta': 'assistants=v1'
       },
       body: JSON.stringify({
         assistant_id: assistantId
       })
     });
+
+    if (!runResponse.ok) {
+      const error = await runResponse.text();
+      console.error('Run creation failed:', error);
+      throw new Error('Failed to create run');
+    }
 
     const run = await runResponse.json();
     console.log('Run created:', run);
@@ -73,7 +99,7 @@ serve(async (req) => {
     let runStatus = await fetch(`https://api.openai.com/v1/threads/${thread.id}/runs/${run.id}`, {
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
-        'OpenAI-Beta': 'assistants=v2'
+        'OpenAI-Beta': 'assistants=v1'
       }
     });
     
@@ -84,7 +110,7 @@ serve(async (req) => {
       runStatus = await fetch(`https://api.openai.com/v1/threads/${thread.id}/runs/${run.id}`, {
         headers: {
           'Authorization': `Bearer ${openAIApiKey}`,
-          'OpenAI-Beta': 'assistants=v2'
+          'OpenAI-Beta': 'assistants=v1'
         }
       });
       runStatusData = await runStatus.json();
@@ -92,6 +118,7 @@ serve(async (req) => {
     }
 
     if (runStatusData.status === 'failed') {
+      console.error('Run failed:', runStatusData.last_error);
       throw new Error('Assistant run failed: ' + JSON.stringify(runStatusData.last_error));
     }
 
@@ -99,10 +126,16 @@ serve(async (req) => {
     const messagesResponse = await fetch(`https://api.openai.com/v1/threads/${thread.id}/messages`, {
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
-        'OpenAI-Beta': 'assistants=v2'
+        'OpenAI-Beta': 'assistants=v1'
       }
     });
     
+    if (!messagesResponse.ok) {
+      const error = await messagesResponse.text();
+      console.error('Messages retrieval failed:', error);
+      throw new Error('Failed to retrieve messages');
+    }
+
     const messages = await messagesResponse.json();
     const generatedContent = messages.data[0].content[0].text.value;
 
@@ -111,7 +144,9 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('Error in generate-social-post function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ 
+      error: error instanceof Error ? error.message : 'An unknown error occurred'
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
