@@ -19,10 +19,7 @@ export default function BrandBible() {
     brandStyle: "modern"
   });
 
-  const [brandBible, setBrandBible] = useState<string | null>(null);
-  const [targetMarket, setTargetMarket] = useState<string | null>(null);
-  const [brandVoice, setBrandVoice] = useState<string | null>(null);
-  const [personas, setPersonas] = useState<string | null>(null);
+  const [generatedContent, setGeneratedContent] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,14 +28,7 @@ export default function BrandBible() {
     try {
       const result = await generateBrandBible(brandInfo);
       if (result) {
-        // Split the content into sections based on clear section headers
-        const sections = result.split(/(?=Basic Brand Bible|Target Market Analysis|Brand Voice|Buyer & Negative Personas)/i);
-        
-        setBrandBible(sections[1] || ''); // Basic Brand Bible section
-        setTargetMarket(sections[2] || ''); // Target Market Analysis section
-        setBrandVoice(sections[3] || ''); // Brand Voice section
-        setPersonas(sections[4] || ''); // Buyer & Negative Personas section
-
+        setGeneratedContent(result);
         toast({
           title: "Brand Bible Generated",
           description: "Your comprehensive brand bible is ready!",
@@ -149,51 +139,18 @@ export default function BrandBible() {
           </CardContent>
         </Card>
 
-        <div className="space-y-8">
-          {brandBible && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Basic Brand Bible</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="whitespace-pre-wrap">{brandBible}</div>
-              </CardContent>
-            </Card>
-          )}
-
-          {targetMarket && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Target Market Analysis</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="whitespace-pre-wrap">{targetMarket}</div>
-              </CardContent>
-            </Card>
-          )}
-
-          {brandVoice && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Brand Voice</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="whitespace-pre-wrap">{brandVoice}</div>
-              </CardContent>
-            </Card>
-          )}
-
-          {personas && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Buyer & Negative Personas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="whitespace-pre-wrap">{personas}</div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+        {generatedContent && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Generated Brand Bible</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="prose max-w-none whitespace-pre-wrap">
+                {generatedContent}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
