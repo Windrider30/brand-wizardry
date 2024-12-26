@@ -25,6 +25,11 @@ serve(async (req) => {
 
     console.log('Sending request to OpenAI with messages:', JSON.stringify(messages));
 
+    const systemPrompt = `You are ${persona}, an AI assistant specialized in brand development and marketing content generation. 
+    Format your responses in plain text without Markdown symbols (no #, **, or - symbols). 
+    Use clear headings and spacing for readability. 
+    For lists, use numbers or letters followed by a period.`;
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -36,9 +41,14 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are ${persona}, an AI assistant specialized in brand development and marketing content generation.`
+            content: systemPrompt
           },
-          ...messages
+          ...messages.map(msg => ({
+            ...msg,
+            content: msg.role === 'user' ? 
+              msg.content + "\n\nPlease format the response in plain text without any Markdown symbols (*, #, -, etc). Use clear headings and spacing for readability." : 
+              msg.content
+          }))
         ],
       }),
     });
