@@ -19,12 +19,10 @@ export default function BrandBible() {
     brandStyle: "modern"
   });
 
-  const [brandBible, setBrandBible] = useState<{
-    basicBrandBible: string;
-    targetMarketAnalysis: string;
-    brandVoice: string;
-    personas: string;
-  } | null>(null);
+  const [brandBible, setBrandBible] = useState<string | null>(null);
+  const [targetMarket, setTargetMarket] = useState<string | null>(null);
+  const [brandVoice, setBrandVoice] = useState<string | null>(null);
+  const [personas, setPersonas] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,13 +31,21 @@ export default function BrandBible() {
     try {
       const result = await generateBrandBible(brandInfo);
       if (result) {
-        setBrandBible(result);
+        // Split the content into sections based on clear section headers
+        const sections = result.split(/(?=Basic Brand Bible|Target Market Analysis|Brand Voice|Buyer & Negative Personas)/i);
+        
+        setBrandBible(sections[1] || ''); // Basic Brand Bible section
+        setTargetMarket(sections[2] || ''); // Target Market Analysis section
+        setBrandVoice(sections[3] || ''); // Brand Voice section
+        setPersonas(sections[4] || ''); // Buyer & Negative Personas section
+
         toast({
           title: "Brand Bible Generated",
           description: "Your comprehensive brand bible is ready!",
         });
       }
     } catch (error) {
+      console.error('Error generating brand bible:', error);
       toast({
         title: "Error",
         description: "Failed to generate brand bible. Please try again.",
@@ -51,9 +57,9 @@ export default function BrandBible() {
   };
 
   return (
-    <div className="container max-w-6xl py-8">
+    <div className="container max-w-7xl py-8">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-4">Create Your Brand Bible</h1>
+        <h1 className="text-4xl font-bold mb-4 text-blue-500">Create Your Brand Bible</h1>
         <p className="text-gray-600">
           Let our AI personas craft a comprehensive brand bible for your business.
           Just provide some basic information to get started.
@@ -143,45 +149,51 @@ export default function BrandBible() {
           </CardContent>
         </Card>
 
-        {brandBible && (
-          <div className="space-y-8">
+        <div className="space-y-8">
+          {brandBible && (
             <Card>
               <CardHeader>
                 <CardTitle>Basic Brand Bible</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="whitespace-pre-wrap">{brandBible.basicBrandBible}</div>
+                <div className="whitespace-pre-wrap">{brandBible}</div>
               </CardContent>
             </Card>
+          )}
 
+          {targetMarket && (
             <Card>
               <CardHeader>
                 <CardTitle>Target Market Analysis</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="whitespace-pre-wrap">{brandBible.targetMarketAnalysis}</div>
+                <div className="whitespace-pre-wrap">{targetMarket}</div>
               </CardContent>
             </Card>
+          )}
 
+          {brandVoice && (
             <Card>
               <CardHeader>
                 <CardTitle>Brand Voice</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="whitespace-pre-wrap">{brandBible.brandVoice}</div>
+                <div className="whitespace-pre-wrap">{brandVoice}</div>
               </CardContent>
             </Card>
+          )}
 
+          {personas && (
             <Card>
               <CardHeader>
                 <CardTitle>Buyer & Negative Personas</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="whitespace-pre-wrap">{brandBible.personas}</div>
+                <div className="whitespace-pre-wrap">{personas}</div>
               </CardContent>
             </Card>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
