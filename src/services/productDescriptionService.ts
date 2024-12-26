@@ -1,5 +1,6 @@
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { parseOpenAIResponse } from "@/utils/contentParser";
 
 interface ProductInfo {
   brandBible: string;
