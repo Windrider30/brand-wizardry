@@ -15,7 +15,7 @@ serve(async (req) => {
   try {
     const { messages, persona } = await req.json();
     
-    if (!messages || !Array.isArray(messages)) {
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
       throw new Error('Invalid messages format');
     }
 
