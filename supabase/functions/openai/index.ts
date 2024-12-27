@@ -26,6 +26,28 @@ serve(async (req) => {
 
     console.log('Sending request to OpenAI with messages:', JSON.stringify(messages));
 
+    // Enhance the system message based on persona
+    let systemContent = `You are ${persona}, an AI assistant specialized in brand development and marketing content generation.`;
+    
+    if (persona === 'dr_brand') {
+      systemContent += `
+        When creating brand bibles, always include:
+        1. Comprehensive Brand Overview
+        2. Compelling Tagline Options (at least 3)
+        3. Clear Mission Statement
+        4. Forward-looking Vision Statement
+        5. Detailed Core Values (minimum 5)
+        6. In-depth Target Market Analysis including:
+           - Detailed Demographics
+           - Psychographics
+           - Behavioral Patterns
+           - Pain Points (3 emotional and 3 practical)
+        7. Brand Voice Guidelines with specific examples
+        8. Detailed Buyer Personas (minimum 2)
+        
+        Format your response in clear sections with proper spacing and headers.`;
+    }
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -33,11 +55,11 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o',
         messages: [
           {
             role: 'system',
-            content: `You are ${persona}, an AI assistant specialized in brand development and marketing content generation. Format your responses in clear sections with proper spacing. Do not use any special formatting symbols.`
+            content: systemContent
           },
           ...messages
         ],
