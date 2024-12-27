@@ -1,5 +1,6 @@
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { parseProductDescription } from "@/utils/openAIResponseParser";
 
 interface ProductInfo {
   brandBible: string;
@@ -47,35 +48,7 @@ export async function generateProductDescription(productInfo: ProductInfo): Prom
     const content = response.data.choices[0].message.content;
     console.log("Raw content from OpenAI:", content);
     
-    // Parse the sections
-    const sections = content.split(/\d+\.\s+/).filter(Boolean);
-    console.log("Parsed sections:", sections);
-    
-    // Extract title from the first section (SEO Title Options)
-    const titles = sections[0].match(/\"([^"]+)\"/g) || [];
-    const newTitle = titles[0]?.replace(/"/g, '') || '';
-
-    // Extract marketing hooks from the second section
-    const hooksSection = sections[1] || '';
-    const marketingHooks = hooksSection.match(/\d+\.\s+"([^"]+)"/g)?.map(hook => {
-      return hook.replace(/^\d+\.\s+"/, '').replace(/"$/, '');
-    }) || [];
-
-    // Extract SEO descriptions from the third section
-    const descriptionsSection = sections[2] || '';
-    const seoDescriptions = descriptionsSection.match(/\d+\.\s+"([^"]+)"/g)?.map(desc => {
-      return desc.replace(/^\d+\.\s+"/, '').replace(/"$/, '');
-    }) || [];
-
-    // Extract meta description from the fourth section
-    const metaDescription = (sections[3]?.match(/\"([^"]+)\"/) || [])[1] || '';
-
-    return {
-      marketingHooks,
-      seoDescriptions,
-      metaDescription,
-      newTitle
-    };
+    return parseProductDescription(content);
   } catch (error) {
     console.error("Error in generateProductDescription:", error);
     toast({
