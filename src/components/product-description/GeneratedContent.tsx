@@ -65,11 +65,11 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {content.seoDescriptions.map((desc, index) => (
+            {content.seoDescriptions && content.seoDescriptions.map((desc, index) => (
               <div key={index} className="space-y-2">
                 <h3 className="text-sm font-medium">Version {index + 1}</h3>
                 <div className="flex items-center justify-between gap-4 p-3 bg-muted rounded-lg">
-                  <div className="text-sm">{desc}</div>
+                  <div className="text-sm whitespace-pre-wrap">{desc}</div>
                   <Button variant="ghost" size="sm" onClick={() => handleCopy(desc)}>
                     <Copy className="h-4 w-4" />
                   </Button>
@@ -86,7 +86,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between gap-4 p-3 bg-muted rounded-lg">
-            <div className="text-sm">{content.metaDescription}</div>
+            <div className="text-sm whitespace-pre-wrap">{content.metaDescription}</div>
             <Button variant="ghost" size="sm" onClick={() => handleCopy(content.metaDescription)}>
               <Copy className="h-4 w-4" />
             </Button>
