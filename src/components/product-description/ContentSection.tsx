@@ -8,6 +8,10 @@ interface ContentSectionProps {
 }
 
 export function ContentSection({ title, content }: ContentSectionProps) {
+  if (!content) {
+    return null;
+  }
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(content);
@@ -25,8 +29,10 @@ export function ContentSection({ title, content }: ContentSectionProps) {
   };
 
   return (
-    <div className="flex items-center justify-between gap-4 p-3 bg-muted rounded-lg">
-      <div className="text-sm whitespace-pre-wrap">{content}</div>
+    <div className="flex items-start justify-between gap-4 p-3 bg-muted rounded-lg">
+      <div className="flex-1">
+        <p className="text-sm whitespace-pre-wrap">{content}</p>
+      </div>
       <Button variant="ghost" size="sm" onClick={handleCopy}>
         <Copy className="h-4 w-4" />
       </Button>

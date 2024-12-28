@@ -6,34 +6,47 @@ interface ParsedProductDescription {
 }
 
 export function parseProductDescription(content: string): ParsedProductDescription {
-  // Split content into sections and filter out empty strings
-  const sections = content.split(/\d+\.\s+/).filter(Boolean);
+  console.log("Parsing content:", content);
   
-  // Extract title from the first section (SEO Title Options)
-  const titles = sections[0]?.match(/\"([^"]+)\"/g) || [];
-  const newTitle = titles[0]?.replace(/"/g, '') || '';
-
-  // Extract marketing hooks from the second section
-  const hooksSection = sections[1] || '';
-  const marketingHooks = hooksSection
-    .match(/\d+\.\s+"([^"]+)"/g)
-    ?.map(hook => hook.replace(/^\d+\.\s+"/, '').replace(/"$/, ''))
-    || [];
-
-  // Extract SEO descriptions from the third section
-  const descriptionsSection = sections[2] || '';
-  const seoDescriptions = descriptionsSection
-    .match(/\d+\.\s+"([^"]+)"/g)
-    ?.map(desc => desc.replace(/^\d+\.\s+"/, '').replace(/"$/, ''))
-    || [];
-
-  // Extract meta description from the fourth section
-  const metaDescription = (sections[3]?.match(/\"([^"]+)\"/) || [])[1] || '';
-
-  return {
-    marketingHooks,
-    seoDescriptions,
-    metaDescription,
-    newTitle
+  // Initialize default values
+  const result: ParsedProductDescription = {
+    marketingHooks: [],
+    seoDescriptions: [],
+    metaDescription: "",
+    newTitle: ""
   };
+
+  // Split content into sections by numbered headers or markdown headers
+  const sections = content.split(/(?=\d+\.\s+|#{1,3}\s+)/);
+  
+  sections.forEach(section => {
+    const cleanSection = section.trim();
+    
+    if (cleanSection.match(/SEO Title|Title Options/i)) {
+      const titles = cleanSection.match(/"([^"]+)"/g) || [];
+      result.newTitle = titles[0]?.replace(/"/g, '') || '';
+    }
+    
+    if (cleanSection.match(/Marketing Hooks/i)) {
+      result.marketingHooks = (cleanSection.match(/"([^"]+)"/g) || [])
+        .map(hook => hook.replace(/"/g, '').trim())
+        .filter(Boolean);
+    }
+    
+    if (cleanSection.match(/SEO Descriptions/i)) {
+      result.seoDescriptions = (cleanSection.match(/"([^"]+)"/g) || [])
+        .map(desc => desc.replace(/"/g, '').trim())
+        .filter(Boolean);
+    }
+    
+    if (cleanSection.match(/Meta Description/i)) {
+      const metaMatch = cleanSection.match(/"([^"]+)"/);
+      if (metaMatch) {
+        result.metaDescription = metaMatch[1].trim();
+      }
+    }
+  });
+
+  console.log("Parsed result:", result);
+  return result;
 }
