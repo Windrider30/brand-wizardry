@@ -12,6 +12,9 @@ interface GeneratedContentProps {
 }
 
 export function GeneratedContent({ content }: GeneratedContentProps) {
+  // Add console logs to debug the content being received
+  console.log("Received content:", content);
+
   return (
     <div className="space-y-8">
       {content.newTitle && (
@@ -25,24 +28,24 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         </Card>
       )}
 
-      {content.marketingHooks && content.marketingHooks.length > 0 && (
+      {Array.isArray(content.marketingHooks) && content.marketingHooks.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Marketing Hooks</CardTitle>
           </CardHeader>
           <CardContent>
-            <ListSection title="Marketing Hooks" items={content.marketingHooks} />
+            <ListSection items={content.marketingHooks} />
           </CardContent>
         </Card>
       )}
 
-      {content.seoDescriptions && content.seoDescriptions.length > 0 && (
+      {Array.isArray(content.seoDescriptions) && content.seoDescriptions.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>SEO Descriptions</CardTitle>
           </CardHeader>
           <CardContent>
-            <ListSection title="SEO Descriptions" items={content.seoDescriptions} />
+            <ListSection items={content.seoDescriptions} />
           </CardContent>
         </Card>
       )}
@@ -53,7 +56,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
             <CardTitle>Meta Description</CardTitle>
           </CardHeader>
           <CardContent>
-            <ContentSection title="Meta Description" content={content.metaDescription} />
+            <ContentSection content={content.metaDescription} />
           </CardContent>
         </Card>
       )}
