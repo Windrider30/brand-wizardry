@@ -3,7 +3,7 @@ import { Copy } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
 interface ContentSectionProps {
-  title: string;
+  title?: string; // Made title optional
   content: string;
 }
 
@@ -31,6 +31,7 @@ export function ContentSection({ title, content }: ContentSectionProps) {
   return (
     <div className="flex items-start justify-between gap-4 p-3 bg-muted rounded-lg">
       <div className="flex-1">
+        {title && <p className="text-sm font-medium mb-1">{title}</p>}
         <p className="text-sm whitespace-pre-wrap">{content}</p>
       </div>
       <Button variant="ghost" size="sm" onClick={handleCopy}>
