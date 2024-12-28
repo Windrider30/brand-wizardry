@@ -16,13 +16,13 @@ export function parseProductDescription(content: string): ParsedProductDescripti
   };
 
   // Split content into sections
-  const sections = content.split(/(?=\d+\.\s+|#{1,3}\s+|Marketing Hooks|SEO Descriptions|Meta Description)/i);
+  const sections = content.split(/---/);
   
   sections.forEach(section => {
     const cleanSection = section.trim();
     
     // Parse SEO Title
-    if (cleanSection.match(/SEO Title|Title Options/i)) {
+    if (cleanSection.match(/SEO Title Options|Title Options/i)) {
       const titles = cleanSection.match(/"([^"]+)"/g) || [];
       result.newTitle = titles[0]?.replace(/"/g, '') || '';
     }
@@ -32,7 +32,7 @@ export function parseProductDescription(content: string): ParsedProductDescripti
       result.marketingHooks = cleanSection
         .split(/\d+\.\s+/)
         .map(hook => hook.replace(/["'\n]/g, '').trim())
-        .filter(hook => hook && !hook.match(/Marketing Hooks/i));
+        .filter(hook => hook && !hook.match(/Marketing Hooks|compelling hooks/i));
     }
     
     // Parse SEO Descriptions
@@ -40,7 +40,7 @@ export function parseProductDescription(content: string): ParsedProductDescripti
       result.seoDescriptions = cleanSection
         .split(/\d+\.\s+/)
         .map(desc => desc.replace(/["'\n]/g, '').trim())
-        .filter(desc => desc && !desc.match(/SEO Descriptions/i));
+        .filter(desc => desc && !desc.match(/SEO Descriptions|versions/i));
     }
     
     // Parse Meta Description

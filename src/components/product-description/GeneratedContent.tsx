@@ -13,7 +13,7 @@ interface GeneratedContentProps {
 
 export function GeneratedContent({ content }: GeneratedContentProps) {
   // Add console logs to debug the content being received
-  console.log("Received content:", content);
+  console.log("Received content in GeneratedContent:", content);
 
   return (
     <div className="space-y-8">
@@ -23,7 +23,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
             <CardTitle>Suggested Title</CardTitle>
           </CardHeader>
           <CardContent>
-            <ContentSection title="Title" content={content.newTitle} />
+            <ContentSection content={content.newTitle} />
           </CardContent>
         </Card>
       )}
