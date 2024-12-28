@@ -12,8 +12,14 @@ interface GeneratedContentProps {
 }
 
 export function GeneratedContent({ content }: GeneratedContentProps) {
-  // Add console logs to debug the content being received
-  console.log("Received content in GeneratedContent:", content);
+  // Add debug logging
+  console.log("GeneratedContent received:", content);
+
+  // Early return if no content
+  if (!content) {
+    console.log("No content provided to GeneratedContent");
+    return null;
+  }
 
   return (
     <div className="space-y-8">

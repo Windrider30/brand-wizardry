@@ -5,7 +5,11 @@ interface ListSectionProps {
 }
 
 export function ListSection({ items }: ListSectionProps) {
+  // Add debug logging
+  console.log("ListSection received items:", items);
+
   if (!items || items.length === 0) {
+    console.log("No items provided to ListSection");
     return null;
   }
 
