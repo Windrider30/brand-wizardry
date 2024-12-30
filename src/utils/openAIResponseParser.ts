@@ -26,10 +26,14 @@ export function parseProductDescription(content: string): ParsedProductDescripti
       
       // Parse SEO Title
       if (cleanSection.match(/SEO Title|Title Options/i)) {
-        const titleMatch = cleanSection.match(/(?<=[\d.]\s+).*$/m);
-        if (titleMatch) {
-          result.newTitle = titleMatch[0].trim();
-          console.log("Found title:", result.newTitle);
+        const titles = cleanSection
+          .split(/\d+\.\s+/)
+          .slice(1)
+          .map(title => title.trim())
+          .filter(Boolean);
+        if (titles.length > 0) {
+          result.newTitle = titles.join('\n');
+          console.log("Found titles:", titles);
         }
       }
       

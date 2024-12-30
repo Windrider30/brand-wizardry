@@ -24,7 +24,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
       {content.newTitle && (
         <Card>
           <CardHeader>
-            <CardTitle>SEO Title</CardTitle>
+            <CardTitle>SEO Title Options</CardTitle>
           </CardHeader>
           <CardContent>
             <ContentSection content={content.newTitle} />
@@ -52,7 +52,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
             <div className="space-y-6">
               {content.seoDescriptions.map((description, index) => (
                 <div key={index} className="space-y-2">
-                  <h3 className="font-semibold">Version {index + 1}</h3>
+                  <h3 className="font-medium text-sm text-muted-foreground">Version {index + 1}</h3>
                   <ContentSection content={description} />
                 </div>
               ))}
