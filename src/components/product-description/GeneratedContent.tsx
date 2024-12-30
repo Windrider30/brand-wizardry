@@ -12,10 +12,8 @@ interface GeneratedContentProps {
 }
 
 export function GeneratedContent({ content }: GeneratedContentProps) {
-  // Add debug logging
   console.log("GeneratedContent received:", content);
 
-  // Early return if no content
   if (!content) {
     console.log("No content provided to GeneratedContent");
     return null;
@@ -26,7 +24,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
       {content.newTitle && (
         <Card>
           <CardHeader>
-            <CardTitle>Suggested Title</CardTitle>
+            <CardTitle>SEO Title</CardTitle>
           </CardHeader>
           <CardContent>
             <ContentSection content={content.newTitle} />

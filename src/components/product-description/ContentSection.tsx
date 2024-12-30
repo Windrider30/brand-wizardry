@@ -7,7 +7,6 @@ interface ContentSectionProps {
 }
 
 export function ContentSection({ content }: ContentSectionProps) {
-  // Add debug logging
   console.log("ContentSection received:", content);
 
   if (!content) {
@@ -23,6 +22,7 @@ export function ContentSection({ content }: ContentSectionProps) {
         description: "Content copied to clipboard",
       });
     } catch (err) {
+      console.error("Error copying to clipboard:", err);
       toast({
         title: "Error",
         description: "Failed to copy to clipboard",
