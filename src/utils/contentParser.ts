@@ -6,88 +6,109 @@ interface ParsedContent {
 }
 
 export function parseOpenAIResponse(content: string): ParsedContent {
+  console.log("Raw content from OpenAI:", content);
+  
   const sections = content.split('\n\n').filter(Boolean);
-  console.log("Parsed sections:", sections);
+  console.log("Split sections:", sections);
 
-  return {
+  const result = {
     title: extractTitle(sections),
     marketingHooks: extractMarketingHooks(sections),
     seoDescriptions: extractSEODescriptions(sections),
     metaDescription: extractMetaDescription(sections),
   };
+
+  console.log("Parsed result:", result);
+  return result;
 }
 
 function extractTitle(sections: string[]): string {
-  const titleSection = sections.find(s => s.toLowerCase().includes('seo title'));
-  if (!titleSection) return '';
+  const titleSection = sections.find(s => 
+    s.toLowerCase().includes('seo title') || 
+    s.toLowerCase().includes('title options')
+  );
+  
+  if (!titleSection) {
+    console.log("No title section found");
+    return '';
+  }
   
   const lines = titleSection.split('\n')
-    .filter(line => line.trim() && !line.toLowerCase().includes('seo title'))
-    .map(line => line.replace(/^\d+\.\s*"|"$/g, '').trim());
+    .filter(line => line.trim() && !line.toLowerCase().includes('seo title') && !line.toLowerCase().includes('title options'))
+    .map(line => line.replace(/^\d+\.\s*"|"$|^\d+\.\s*/g, '').trim());
   
+  console.log("Extracted title lines:", lines);
   return lines[0] || '';
 }
 
 function extractMarketingHooks(sections: string[]): string[] {
-  const hooksSection = sections.find(s => s.toLowerCase().includes('marketing hooks'));
-  return hooksSection
-    ?.split('\n')
-    .filter(line => line.startsWith('-') || line.match(/^\d+\./))
-    .map(hook => hook.replace(/^[-\d.\s]+/, '').trim())
-    .map(hook => hook.replace(/\*\*|\*/g, ''))
-    .map(hook => hook.replace(/^["']|["']$/g, '')) || [];
+  const hooksSection = sections.find(s => 
+    s.toLowerCase().includes('marketing hooks')
+  );
+  
+  if (!hooksSection) {
+    console.log("No marketing hooks section found");
+    return [];
+  }
+  
+  const hooks = hooksSection
+    .split('\n')
+    .filter(line => line.trim() && !line.toLowerCase().includes('marketing hooks'))
+    .map(line => line.replace(/^\d+\.\s*"|"$|^\*\*.*\*\*$|^[-*]\s*/g, '').trim())
+    .filter(hook => hook && !hook.toLowerCase().includes('marketing hooks'));
+  
+  console.log("Extracted marketing hooks:", hooks);
+  return hooks;
 }
 
 function extractSEODescriptions(sections: string[]): string[] {
-  // Find the SEO Descriptions section
-  const descriptionSectionIndex = sections.findIndex(s => 
-    s.toLowerCase().includes('seo descriptions') && !s.toLowerCase().includes('meta')
-  );
-  
-  if (descriptionSectionIndex === -1) return [];
-  
   const descriptions: string[] = [];
+  let isInDescriptionSection = false;
   
-  // Start from the section after "SEO Descriptions"
-  for (let i = descriptionSectionIndex + 1; i < sections.length; i++) {
-    const section = sections[i];
-    
-    // Stop if we hit another major section
-    if (section.toLowerCase().includes('meta description') || 
-        section.toLowerCase().includes('feel free to choose')) {
-      break;
-    }
-    
-    // Skip sections that contain SEO Title Options
-    if (section.toLowerCase().includes('seo title')) {
+  for (const section of sections) {
+    if (section.toLowerCase().includes('seo descriptions')) {
+      isInDescriptionSection = true;
       continue;
     }
     
-    // Only process sections that contain actual descriptions
-    if (section.toLowerCase().includes('option') || 
-        section.match(/^###?\s*Option/i)) {
+    if (isInDescriptionSection && 
+        !section.toLowerCase().includes('meta description') &&
+        section.trim().length > 0) {
       const cleanedDescription = section
-        .replace(/^###?\s*Option \d+/i, '')
-        .replace(/^Option \d+:?/i, '')
-        .replace(/\*\*|\*/g, '')
+        .replace(/^Version \d+:?/i, '')
+        .replace(/^\d+\.\s*/g, '')
+        .replace(/\*\*.*\*\*/, '')
         .trim();
       
       if (cleanedDescription) {
         descriptions.push(cleanedDescription);
       }
     }
+    
+    if (isInDescriptionSection && section.toLowerCase().includes('meta description')) {
+      break;
+    }
   }
   
+  console.log("Extracted SEO descriptions:", descriptions);
   return descriptions;
 }
 
 function extractMetaDescription(sections: string[]): string {
-  const metaSection = sections.find(s => s.toLowerCase().includes('meta description'));
-  return metaSection
-    ?.split('\n')
-    .slice(1)
-    .join(' ')
-    .replace(/\*\*|\*/g, '')
-    .replace(/^["']|["']$/g, '')
-    .trim() || '';
+  const metaSection = sections.find(s => 
+    s.toLowerCase().includes('meta description')
+  );
+  
+  if (!metaSection) {
+    console.log("No meta description section found");
+    return '';
+  }
+  
+  const lines = metaSection.split('\n')
+    .filter(line => line.trim() && !line.toLowerCase().includes('meta description'))
+    .map(line => line.replace(/^\d+\.\s*"|"$|^\*\*.*\*\*$/g, '').trim());
+  
+  const metaDescription = lines[0] || '';
+  console.log("Extracted meta description:", metaDescription);
+  return metaDescription;
 }

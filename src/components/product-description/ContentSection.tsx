@@ -32,11 +32,11 @@ export function ContentSection({ content }: ContentSectionProps) {
   };
 
   return (
-    <div className="flex items-start justify-between gap-4 p-3 bg-muted rounded-lg">
+    <div className="flex items-start justify-between gap-4 p-4 bg-muted rounded-lg">
       <div className="flex-1">
-        <p className="text-sm whitespace-pre-wrap">{content}</p>
+        <p className="text-sm whitespace-pre-wrap leading-relaxed">{content}</p>
       </div>
-      <Button variant="ghost" size="sm" onClick={handleCopy}>
+      <Button variant="ghost" size="sm" onClick={handleCopy} className="shrink-0">
         <Copy className="h-4 w-4" />
       </Button>
     </div>
