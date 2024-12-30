@@ -16,38 +16,40 @@ export function parseProductDescription(content: string): ParsedProductDescripti
   };
 
   // Split content into sections
-  const sections = content.split(/---/);
+  const sections = content.split(/\n\n|\r\n\r\n/);
   
   sections.forEach(section => {
     const cleanSection = section.trim();
     
     // Parse SEO Title
     if (cleanSection.match(/SEO Title Options|Title Options/i)) {
-      const titles = cleanSection.match(/"([^"]+)"/g) || [];
-      result.newTitle = titles[0]?.replace(/"/g, '') || '';
+      const titles = cleanSection.match(/(?<=\d\.\s+).*$/gm) || [];
+      result.newTitle = titles[0]?.trim() || '';
     }
     
     // Parse Marketing Hooks
     if (cleanSection.match(/Marketing Hooks/i)) {
       result.marketingHooks = cleanSection
         .split(/\d+\.\s+/)
-        .map(hook => hook.replace(/["'\n]/g, '').trim())
-        .filter(hook => hook && !hook.match(/Marketing Hooks|compelling hooks/i));
+        .slice(1) // Remove the header
+        .map(hook => hook.trim())
+        .filter(Boolean);
     }
     
     // Parse SEO Descriptions
     if (cleanSection.match(/SEO Descriptions/i)) {
       result.seoDescriptions = cleanSection
         .split(/\d+\.\s+/)
-        .map(desc => desc.replace(/["'\n]/g, '').trim())
-        .filter(desc => desc && !desc.match(/SEO Descriptions|versions/i));
+        .slice(1) // Remove the header
+        .map(desc => desc.trim())
+        .filter(desc => desc && desc.length >= 200);
     }
     
     // Parse Meta Description
     if (cleanSection.match(/Meta Description/i)) {
-      const metaMatch = cleanSection.match(/"([^"]+)"/);
+      const metaMatch = cleanSection.match(/(?<=Meta Description:?\s+).*$/m);
       if (metaMatch) {
-        result.metaDescription = metaMatch[1].trim();
+        result.metaDescription = metaMatch[0].trim();
       }
     }
   });

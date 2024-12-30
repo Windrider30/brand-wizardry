@@ -21,29 +21,39 @@ export async function generateProductDescription(productInfo: ProductInfo): Prom
       body: {
         messages: [{
           role: "user",
-          content: `Create compelling product content using Style 2 for:
+          content: `Using this brand bible for tone and style:
+            ${productInfo.brandBible}
+            
+            For this product:
             Product Name: ${productInfo.name}
             Key Features & Benefits: ${productInfo.features}
             
-            Using this brand bible for tone and style:
-            ${productInfo.brandBible}
-            
             Please provide:
-            1. SEO Title Options (3 versions, each compelling and optimized for search)
-            2. Marketing Hooks (5 compelling hooks, each 20-30 words that speak directly to pain points)
-            3. SEO Descriptions (3 versions, each 150-300 words, incorporating brand voice, addressing target market pain points, and positioning the product as both solution and reward)
-            4. Meta Description (1 version, exactly 155 characters, compelling and SEO-optimized)
+            1. SEO Title Options (3 versions, each between 60-75 characters, compelling and optimized for search)
             
-            Ensure each SEO description:
-            - Is between 150-300 words
-            - Uses the brand's unique voice and tone
-            - Addresses all target market pain points
-            - Positions the product as both a solution and a reward
-            - Incorporates emotional triggers
-            - Uses persuasive language
-            - Includes clear benefits and value propositions
+            2. Marketing Hooks (3 unique options that each use one pain point, following Style 2 where the product is both solution and reward)
             
-            Format your response with clear numbered sections and line breaks between sections.`
+            3. SEO Descriptions (3 unique versions)
+            Requirements for each description:
+            - Must be between 200-300 words
+            - Must have exactly two paragraphs
+            - Must use the brand's unique voice and tone
+            - Must address ALL target market pain points subtly but impactfully
+            - Must position the product as both the ONLY solution and a reward
+            - Must NOT use the words "Functional," "Versatile," "Whimsical" or variations
+            - Must incorporate emotional triggers
+            - Must use persuasive language
+            - Must include clear benefits and value propositions
+            
+            4. Meta Description (1 version, exactly 175 characters, using brand voice)
+            
+            Format your response with clear numbered sections and line breaks between sections.
+            
+            Remember:
+            - The product should be presented as both the solution and a reward
+            - Each description must be two paragraphs
+            - Avoid the forbidden words completely
+            - Use Style 2 consistently throughout`
         }],
         persona: "product_copywriter"
       }
