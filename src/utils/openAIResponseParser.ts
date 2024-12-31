@@ -21,6 +21,7 @@ export function parseProductDescription(content: string): ParsedProductDescripti
     console.log("Split sections:", sections);
     
     let currentSection = "";
+    let currentDescription = "";
     
     sections.forEach(section => {
       const cleanSection = section.trim();
@@ -48,7 +49,7 @@ export function parseProductDescription(content: string): ParsedProductDescripti
             break;
             
           case "hooks":
-            // Extract hooks (removing asterisks and "Hook:" prefix)
+            // Extract hooks (removing asterisks and quotes)
             const hook = cleanSection
               .replace(/\*\*/g, '')
               .replace(/Hook:\s*"/g, '')
@@ -60,14 +61,17 @@ export function parseProductDescription(content: string): ParsedProductDescripti
             break;
             
           case "descriptions":
-            // Extract descriptions (removing version numbers and "Description:" prefix)
-            if (cleanSection.includes("Description:")) {
-              const description = cleanSection
-                .replace(/^\d+\.\s*\*\*Description:\*\*\s+/g, '')
-                .trim();
-              if (description) {
-                result.seoDescriptions.push(description);
+            // Handle description versions
+            if (cleanSection.startsWith("**Version")) {
+              if (currentDescription) {
+                result.seoDescriptions.push(currentDescription.trim());
               }
+              currentDescription = "";
+            } else if (!cleanSection.includes("SEO Descriptions") && cleanSection) {
+              if (currentDescription) {
+                currentDescription += "\n\n";
+              }
+              currentDescription += cleanSection;
             }
             break;
             
@@ -81,6 +85,11 @@ export function parseProductDescription(content: string): ParsedProductDescripti
         }
       }
     });
+
+    // Add the last description if there is one
+    if (currentDescription) {
+      result.seoDescriptions.push(currentDescription.trim());
+    }
   } catch (error) {
     console.error("Error parsing product description:", error);
   }
