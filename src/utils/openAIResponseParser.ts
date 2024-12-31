@@ -22,52 +22,58 @@ export function parseProductDescription(content: string): ParsedProductDescripti
     
     let currentSection = "";
     let currentDescription = "";
+    let isCollectingDescription = false;
     
     sections.forEach(section => {
       const cleanSection = section.trim();
-      console.log("Processing section:", cleanSection);
       
       if (cleanSection.includes("SEO Title Options")) {
         currentSection = "titles";
+        isCollectingDescription = false;
       } else if (cleanSection.includes("Marketing Hooks")) {
         currentSection = "hooks";
+        isCollectingDescription = false;
       } else if (cleanSection.includes("SEO Descriptions")) {
         currentSection = "descriptions";
+        isCollectingDescription = false;
       } else if (cleanSection.includes("Meta Description")) {
         currentSection = "meta";
+        isCollectingDescription = false;
       } else if (cleanSection && currentSection) {
         switch (currentSection) {
           case "titles":
-            // Extract titles (removing numbers and quotes)
-            const titles = cleanSection
-              .split('\n')
-              .map(line => line.replace(/^\d+\.\s*"|"$/g, '').trim())
-              .filter(title => title && !title.includes("SEO Title Options"));
-            if (titles.length > 0) {
-              result.newTitle = titles.join('\n');
+            if (!cleanSection.includes("SEO Title Options")) {
+              const titles = cleanSection
+                .split('\n')
+                .map(line => line.replace(/^\d+\.\s*"|"$/g, '').trim())
+                .filter(title => title && !title.includes("SEO Title Options"));
+              if (titles.length > 0) {
+                result.newTitle = titles.join('\n');
+              }
             }
             break;
             
           case "hooks":
-            // Extract hooks (removing asterisks and quotes)
-            const hook = cleanSection
-              .replace(/\*\*/g, '')
-              .replace(/Hook:\s*"/g, '')
-              .replace(/"$/g, '')
-              .trim();
-            if (hook && !hook.includes("Marketing Hooks")) {
-              result.marketingHooks.push(hook);
+            if (!cleanSection.includes("Marketing Hooks")) {
+              const hook = cleanSection
+                .replace(/^\d+\.\s*/, '')
+                .replace(/\*\*.*?\*\*:\s*/, '')
+                .replace(/^"|"$/g, '')
+                .trim();
+              if (hook) {
+                result.marketingHooks.push(hook);
+              }
             }
             break;
             
           case "descriptions":
-            // Handle description versions
             if (cleanSection.startsWith("**Version")) {
               if (currentDescription) {
                 result.seoDescriptions.push(currentDescription.trim());
               }
               currentDescription = "";
-            } else if (!cleanSection.includes("SEO Descriptions") && cleanSection) {
+              isCollectingDescription = true;
+            } else if (isCollectingDescription && !cleanSection.includes("SEO Descriptions")) {
               if (currentDescription) {
                 currentDescription += "\n\n";
               }
@@ -76,10 +82,11 @@ export function parseProductDescription(content: string): ParsedProductDescripti
             break;
             
           case "meta":
-            // Extract meta description (removing quotes)
-            const meta = cleanSection.replace(/^"|"$/g, '').trim();
-            if (meta && !meta.includes("Meta Description")) {
-              result.metaDescription = meta;
+            if (!cleanSection.includes("Meta Description")) {
+              const meta = cleanSection.replace(/^"|"$/g, '').trim();
+              if (meta) {
+                result.metaDescription = meta;
+              }
             }
             break;
         }
@@ -90,10 +97,11 @@ export function parseProductDescription(content: string): ParsedProductDescripti
     if (currentDescription) {
       result.seoDescriptions.push(currentDescription.trim());
     }
+
+    console.log("Final parsed result:", result);
   } catch (error) {
     console.error("Error parsing product description:", error);
   }
 
-  console.log("Final parsed result:", result);
   return result;
 }
