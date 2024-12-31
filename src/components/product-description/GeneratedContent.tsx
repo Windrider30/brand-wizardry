@@ -19,15 +19,25 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
     return null;
   }
 
+  // Split newTitle into array if it contains line breaks
+  const titles = content.newTitle ? content.newTitle.split('\n') : [];
+
   return (
     <div className="space-y-8">
-      {content.newTitle && (
+      {titles.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>SEO Title Options</CardTitle>
           </CardHeader>
           <CardContent>
-            <ContentSection content={content.newTitle} />
+            <div className="space-y-4">
+              {titles.map((title, index) => (
+                <div key={index} className="space-y-2">
+                  <h3 className="font-medium text-sm text-muted-foreground">Version {index + 1}</h3>
+                  <ContentSection content={title} />
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       )}
