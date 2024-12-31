@@ -20,7 +20,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
   }
 
   // Split newTitle into array if it contains line breaks
-  const titles = content.newTitle ? content.newTitle.split('\n') : [];
+  const titles = content.newTitle ? content.newTitle.split('\n').filter(Boolean) : [];
 
   return (
     <div className="space-y-8">
@@ -48,7 +48,14 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
             <CardTitle>Marketing Hooks</CardTitle>
           </CardHeader>
           <CardContent>
-            <ListSection items={content.marketingHooks} />
+            <div className="space-y-4">
+              {content.marketingHooks.map((hook, index) => (
+                <div key={index} className="space-y-2">
+                  <h3 className="font-medium text-sm text-muted-foreground">Hook {index + 1}</h3>
+                  <ContentSection content={hook} />
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       )}

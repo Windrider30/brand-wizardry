@@ -20,51 +20,66 @@ export function parseProductDescription(content: string): ParsedProductDescripti
     const sections = content.split(/\n\n|\r\n\r\n/);
     console.log("Split sections:", sections);
     
+    let currentSection = "";
+    
     sections.forEach(section => {
       const cleanSection = section.trim();
-      console.log("Processing section:", cleanSection);
       
-      // Parse SEO Title
-      if (cleanSection.match(/SEO Title|Title Options/i)) {
-        const titles = cleanSection
-          .split(/\d+\.\s+/)
-          .slice(1)
-          .map(title => title.trim())
-          .filter(Boolean);
-        if (titles.length > 0) {
-          result.newTitle = titles.join('\n');
-          console.log("Found titles:", titles);
-        }
-      }
-      
-      // Parse Marketing Hooks
-      if (cleanSection.match(/Marketing Hooks/i)) {
-        const hooks = cleanSection
-          .split(/\d+\.\s+/)
-          .slice(1)
-          .map(hook => hook.trim())
-          .filter(Boolean);
-        result.marketingHooks = hooks;
-        console.log("Found marketing hooks:", hooks);
-      }
-      
-      // Parse SEO Descriptions
-      if (cleanSection.match(/SEO Descriptions?/i)) {
-        const descriptions = cleanSection
-          .split(/Version \d+:|^\d+\.\s+/m)
-          .slice(1)
-          .map(desc => desc.trim())
-          .filter(desc => desc.length >= 150);
-        result.seoDescriptions = descriptions;
-        console.log("Found SEO descriptions:", descriptions);
-      }
-      
-      // Parse Meta Description
-      if (cleanSection.match(/Meta Description/i)) {
-        const metaMatch = cleanSection.match(/(?<=Meta Description:?\s+).*$/m);
-        if (metaMatch) {
-          result.metaDescription = metaMatch[0].trim();
-          console.log("Found meta description:", result.metaDescription);
+      // Parse SEO Title Options
+      if (cleanSection.includes("SEO Title Options")) {
+        currentSection = "titles";
+      } else if (cleanSection.includes("Marketing Hooks")) {
+        currentSection = "hooks";
+      } else if (cleanSection.includes("SEO Descriptions")) {
+        currentSection = "descriptions";
+      } else if (cleanSection.includes("Meta Description")) {
+        currentSection = "meta";
+      } else if (cleanSection.startsWith("---")) {
+        currentSection = "";
+      } else if (currentSection && cleanSection) {
+        switch (currentSection) {
+          case "titles":
+            // Extract titles (removing numbers and quotes)
+            const titles = cleanSection
+              .split('\n')
+              .map(line => line.replace(/^\d+\.\s*"|"$/, '').trim())
+              .filter(title => title && !title.includes("SEO Title Options"));
+            if (titles.length > 0) {
+              result.newTitle = titles.join('\n');
+            }
+            break;
+            
+          case "hooks":
+            // Extract hooks (removing asterisks and "Hook:" prefix)
+            const hook = cleanSection
+              .replace(/\*\*/g, '')
+              .replace(/Hook:\s*"/g, '')
+              .replace(/"$/g, '')
+              .trim();
+            if (hook && !hook.includes("Marketing Hooks")) {
+              result.marketingHooks.push(hook);
+            }
+            break;
+            
+          case "descriptions":
+            // Extract descriptions (removing version numbers and asterisks)
+            if (cleanSection.includes("Description:")) {
+              const description = cleanSection
+                .replace(/^\d+\.\s*\*\*Description:\*\*\s+/g, '')
+                .trim();
+              if (description) {
+                result.seoDescriptions.push(description);
+              }
+            }
+            break;
+            
+          case "meta":
+            // Extract meta description (removing quotes)
+            const meta = cleanSection.replace(/^"|"$/g, '').trim();
+            if (meta && !meta.includes("Meta Description")) {
+              result.metaDescription = meta;
+            }
+            break;
         }
       }
     });
