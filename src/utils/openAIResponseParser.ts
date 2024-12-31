@@ -24,8 +24,8 @@ export function parseProductDescription(content: string): ParsedProductDescripti
     
     sections.forEach(section => {
       const cleanSection = section.trim();
+      console.log("Processing section:", cleanSection);
       
-      // Parse SEO Title Options
       if (cleanSection.includes("SEO Title Options")) {
         currentSection = "titles";
       } else if (cleanSection.includes("Marketing Hooks")) {
@@ -34,15 +34,13 @@ export function parseProductDescription(content: string): ParsedProductDescripti
         currentSection = "descriptions";
       } else if (cleanSection.includes("Meta Description")) {
         currentSection = "meta";
-      } else if (cleanSection.startsWith("---")) {
-        currentSection = "";
-      } else if (currentSection && cleanSection) {
+      } else if (cleanSection && currentSection) {
         switch (currentSection) {
           case "titles":
             // Extract titles (removing numbers and quotes)
             const titles = cleanSection
               .split('\n')
-              .map(line => line.replace(/^\d+\.\s*"|"$/, '').trim())
+              .map(line => line.replace(/^\d+\.\s*"|"$/g, '').trim())
               .filter(title => title && !title.includes("SEO Title Options"));
             if (titles.length > 0) {
               result.newTitle = titles.join('\n');
@@ -62,7 +60,7 @@ export function parseProductDescription(content: string): ParsedProductDescripti
             break;
             
           case "descriptions":
-            // Extract descriptions (removing version numbers and asterisks)
+            // Extract descriptions (removing version numbers and "Description:" prefix)
             if (cleanSection.includes("Description:")) {
               const description = cleanSection
                 .replace(/^\d+\.\s*\*\*Description:\*\*\s+/g, '')
