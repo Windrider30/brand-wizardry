@@ -8,13 +8,15 @@ interface KeywordsInputProps {
 
 export function KeywordsInput({ keywords, onChange }: KeywordsInputProps) {
   const handleKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Allow typing commas and spaces
-    const newKeywords = value.includes(',') 
-      ? value.split(',').map(k => k.trim()).filter(Boolean)
-      : [value.trim()];
+    const inputValue = e.target.value;
     
-    onChange(newKeywords.filter(k => k !== ''));
+    // Split by comma, handle multiple spaces, and filter empty strings
+    const newKeywords = inputValue
+      .split(',')
+      .map(keyword => keyword.trim())
+      .filter(keyword => keyword.length > 0);
+    
+    onChange(newKeywords);
   };
 
   return (
