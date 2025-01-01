@@ -55,6 +55,7 @@ export function SeoArticleForm({
   };
 
   const handleKeywordChange = (value: string) => {
+    // Split by comma, trim whitespace, and filter out empty strings
     const keywords = value.split(',').map(k => k.trim()).filter(Boolean);
     setFormData({ ...formData, keywords });
   };
@@ -102,7 +103,7 @@ export function SeoArticleForm({
             </Label>
             <Input
               id="keywords"
-              placeholder="Enter keywords or let AI generate them"
+              placeholder="Enter keywords separated by commas, e.g.: seo, marketing, content"
               value={formData.keywords.join(', ')}
               onChange={(e) => handleKeywordChange(e.target.value)}
               className="text-base h-12"
