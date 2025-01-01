@@ -10,13 +10,20 @@ export function KeywordsInput({ keywords, onChange }: KeywordsInputProps) {
   const handleKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     
-    // Split by comma, handle multiple spaces, and filter empty strings
-    const newKeywords = inputValue
-      .split(',')
-      .map(keyword => keyword.trim())
-      .filter(keyword => keyword.length > 0);
+    // Keep the raw input value for display
+    const displayValue = inputValue;
     
-    onChange(newKeywords);
+    // Only split into keywords array when there's a comma
+    if (inputValue.includes(',')) {
+      const newKeywords = inputValue
+        .split(',')
+        .map(keyword => keyword.trim())
+        .filter(keyword => keyword.length > 0);
+      onChange(newKeywords);
+    } else {
+      // If no comma, treat the entire input as a single keyword
+      onChange(inputValue.trim() ? [inputValue.trim()] : []);
+    }
   };
 
   return (
@@ -26,7 +33,7 @@ export function KeywordsInput({ keywords, onChange }: KeywordsInputProps) {
       </Label>
       <Input
         id="keywords"
-        placeholder="Enter keywords separated by commas, e.g.: seo, marketing, content"
+        placeholder="Enter keywords separated by commas, e.g.: content marketing, social media strategy"
         value={keywords.join(', ')}
         onChange={handleKeywordChange}
         className="text-base h-12"
