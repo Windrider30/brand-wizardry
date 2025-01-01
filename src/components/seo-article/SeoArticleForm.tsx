@@ -54,10 +54,17 @@ export function SeoArticleForm({
     });
   };
 
-  const handleKeywordChange = (value: string) => {
-    // Split by comma, trim whitespace, and filter out empty strings
-    const keywords = value.split(',').map(k => k.trim()).filter(Boolean);
-    setFormData({ ...formData, keywords });
+  const handleKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow typing commas and spaces
+    const keywords = value.includes(',') 
+      ? value.split(',').map(k => k.trim()).filter(Boolean)
+      : [value.trim()];
+    
+    setFormData({ 
+      ...formData, 
+      keywords: keywords.filter(k => k !== '')
+    });
   };
 
   return (
@@ -105,7 +112,7 @@ export function SeoArticleForm({
               id="keywords"
               placeholder="Enter keywords separated by commas, e.g.: seo, marketing, content"
               value={formData.keywords.join(', ')}
-              onChange={(e) => handleKeywordChange(e.target.value)}
+              onChange={handleKeywordChange}
               className="text-base h-12"
             />
           </div>
