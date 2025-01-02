@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ContentSection } from "./ContentSection";
 
 interface GeneratedContentProps {
@@ -9,6 +9,7 @@ interface GeneratedContentProps {
     seoTitles: string[];
   };
 }
+
 export function GeneratedContent({ content = {} }: GeneratedContentProps) {
   const {
     marketingHooks = [],
