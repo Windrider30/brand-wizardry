@@ -9,31 +9,32 @@ interface KeywordsInputProps {
 export function KeywordsInput({ keywords, onChange }: KeywordsInputProps) {
   const handleKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    
-    // Allow typing freely, including spaces and commas
-    if (inputValue === '') {
+
+    // If the input is empty, update with an empty array
+    if (inputValue.trim() === '') {
       onChange([]);
-    } else {
-      // Split by comma, but preserve spaces within each keyword
-      const newKeywords = inputValue
-        .split(',')
-        .map(keyword => keyword.trim())
-        .filter(Boolean); // Remove empty strings
-      
-      // If there are no commas, treat the entire input as a single keyword
-      onChange(newKeywords.length > 0 ? newKeywords : [inputValue]);
+      return;
     }
+
+    // Split by commas and spaces, and filter out empty values
+    const newKeywords = inputValue
+      .split(/[\s,]+/) // Split by any combination of spaces or commas
+      .map((keyword) => keyword.trim()) // Remove leading/trailing whitespace
+      .filter((keyword) => keyword.length > 0); // Remove empty strings
+
+    // Update the parent component with the new array of keywords
+    onChange(newKeywords);
   };
 
   return (
     <div className="space-y-3">
       <Label htmlFor="keywords" className="text-lg font-semibold">
-        SEO Keywords (Optional, comma-separated)
+        SEO Keywords (Optional, separated by commas or spaces)
       </Label>
       <Input
         id="keywords"
-        placeholder="Enter keywords separated by commas, e.g.: content marketing, social media strategy"
-        value={keywords.join(', ')}
+        placeholder="Enter keywords separated by commas or spaces, e.g.: content marketing, social media strategy"
+        value={keywords.join(', ')} // Show keywords as a comma-separated string
         onChange={handleKeywordChange}
         className="text-base h-12"
       />
