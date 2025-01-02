@@ -10,19 +10,25 @@ export function KeywordsInput({ keywords, onChange }: KeywordsInputProps) {
   const handleKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     
-    // Keep the raw input value for display
-    const displayValue = inputValue;
-    
-    // Only split into keywords array when there's a comma
-    if (inputValue.includes(',')) {
+    // Always update with the current input value, allowing spaces and commas
+    if (inputValue === '') {
+      onChange([]);
+    } else if (inputValue.endsWith(',')) {
+      // When user adds a comma, split into keywords
       const newKeywords = inputValue
         .split(',')
         .map(keyword => keyword.trim())
         .filter(keyword => keyword.length > 0);
       onChange(newKeywords);
     } else {
-      // If no comma, treat the entire input as a single keyword
-      onChange(inputValue.trim() ? [inputValue.trim()] : []);
+      // During typing, treat as keywords only if there are commas
+      const newKeywords = inputValue.includes(',')
+        ? inputValue
+            .split(',')
+            .map(keyword => keyword.trim())
+            .filter(keyword => keyword.length > 0)
+        : [inputValue.trim()];
+      onChange(newKeywords);
     }
   };
 
