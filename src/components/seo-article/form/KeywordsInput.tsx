@@ -1,6 +1,6 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 interface KeywordsInputProps {
   keywords: string[];
@@ -8,34 +8,32 @@ interface KeywordsInputProps {
 }
 
 export function KeywordsInput({ keywords, onChange }: KeywordsInputProps) {
-  // Add debugging to track state changes
+  const [inputValue, setInputValue] = useState(keywords.join(", ")); // Temporary state for user input
+
   useEffect(() => {
-    console.log("Current keywords state:", keywords);
+    setInputValue(keywords.join(", ")); // Sync inputValue with keywords when keywords change externally
   }, [keywords]);
 
-  const handleKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    console.log("Raw input value:", inputValue); // Debug raw input
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value); // Update the raw input value immediately
+  };
 
-    // If the input is empty, update with an empty array
-    if (inputValue.trim() === '') {
-      console.log("Empty input detected, clearing keywords");
-      onChange([]);
-      return;
-    }
-
-    // Keep the original input value for display
-    const displayValue = inputValue;
-    console.log("Display value:", displayValue);
-
-    // Only process keywords when there's actual content
+  const handleBlurOrEnter = () => {
+    // Process the input only when the user confirms their input
     const newKeywords = inputValue
       .split(/[,\s]+/) // Split by commas or spaces
-      .map(keyword => keyword.trim())
-      .filter(keyword => keyword.length > 0);
+      .map((keyword) => keyword.trim()) // Trim whitespace
+      .filter((keyword) => keyword.length > 0); // Remove empty keywords
 
-    console.log("Processed keywords:", newKeywords); // Debug processed keywords
-    onChange(newKeywords);
+    onChange(newKeywords); // Pass processed keywords to parent
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleBlurOrEnter();
+    }
   };
 
   return (
@@ -45,18 +43,17 @@ export function KeywordsInput({ keywords, onChange }: KeywordsInputProps) {
       </Label>
       <Input
         id="keywords"
-        type="text" // Explicitly set type to text
+        type="text"
         placeholder="Enter keywords separated by commas or spaces, e.g.: content marketing, social media strategy"
-        value={keywords.join(', ')}
-        onChange={handleKeywordChange}
+        value={inputValue} // Controlled input value
+        onChange={handleInputChange}
+        onBlur={handleBlurOrEnter} // Trigger processing on blur
+        onKeyPress={handleKeyPress} // Handle Enter key
         className="text-base h-12"
-        // Remove any potential restrictions
-        maxLength={undefined}
-        pattern={undefined}
         autoComplete="off"
       />
       {/* Debug display */}
-      {process.env.NODE_ENV === 'development' && (
+      {process.env.NODE_ENV === "development" && (
         <div className="text-xs text-gray-500 mt-1">
           Current keywords: {JSON.stringify(keywords)}
         </div>
