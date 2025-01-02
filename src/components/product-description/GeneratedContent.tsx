@@ -1,13 +1,13 @@
+```typescript
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ContentSection } from "./ContentSection";
-import { ListSection } from "./ListSection";
 
 interface GeneratedContentProps {
   content: {
     marketingHooks: string[];
     seoDescriptions: string[];
     metaDescription: string;
-    newTitle: string;
+    seoTitles: string[];
   };
 }
 
@@ -19,19 +19,17 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
     return null;
   }
 
-  // Split newTitle into array if it contains line breaks
-  const titles = content.newTitle ? content.newTitle.split('\n').filter(Boolean) : [];
-
   return (
     <div className="space-y-8">
-      {titles.length > 0 && (
+      {/* SEO Titles */}
+      {content.seoTitles.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>SEO Title Options</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {titles.map((title, index) => (
+              {content.seoTitles.map((title, index) => (
                 <div key={index} className="space-y-2">
                   <h3 className="font-medium text-sm text-muted-foreground">Version {index + 1}</h3>
                   <ContentSection content={title} />
@@ -42,7 +40,8 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         </Card>
       )}
 
-      {Array.isArray(content.marketingHooks) && content.marketingHooks.length > 0 && (
+      {/* Marketing Hooks */}
+      {content.marketingHooks.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Marketing Hooks</CardTitle>
@@ -60,7 +59,8 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         </Card>
       )}
 
-      {Array.isArray(content.seoDescriptions) && content.seoDescriptions.length > 0 && (
+      {/* SEO Descriptions */}
+      {content.seoDescriptions.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>SEO Descriptions</CardTitle>
@@ -78,6 +78,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         </Card>
       )}
 
+      {/* Meta Description */}
       {content.metaDescription && (
         <Card>
           <CardHeader>
@@ -91,3 +92,4 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
     </div>
   );
 }
+```
