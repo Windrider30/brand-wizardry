@@ -10,38 +10,40 @@ interface GeneratedContentProps {
 function parseContent(rawContent: string) {
   if (!rawContent) return { seoTitles: [], marketingHooks: [], seoDescriptions: [] };
 
-  const sections = rawContent.match(/[\s\S]*?---/g);
+  // Use regex to split and match each section
+  const seoTitlesMatch = rawContent.match(/SEO Title Options([\s\S]*?)---/);
+  const marketingHooksMatch = rawContent.match(/Marketing Hooks([\s\S]*?)---/);
+  const seoDescriptionsMatch = rawContent.match(/SEO Descriptions([\s\S]*?)---/);
+  const metaDescriptionMatch = rawContent.match(/Meta Description\s*(.*)/);
 
-  const seoTitles = sections && sections[0]
-    ? sections[0].match(/"(.*?)"/g)?.map(item => item.slice(1, -1)) || []
+  const seoTitles = seoTitlesMatch
+    ? seoTitlesMatch[1].match(/"(.*?)"/g)?.map(item => item.slice(1, -1)) || []
     : [];
 
-  const marketingHooks = sections && sections[1]
-    ? sections[1].split('\n').filter(line => line.includes('"')).map(line => {
+  const marketingHooks = marketingHooksMatch
+    ? marketingHooksMatch[1].split('\n').filter(line => line.includes('"')).map(line => {
         const hookMatch = line.match(/"(.*?)"/);
         return hookMatch ? hookMatch[1] : '';
       })
     : [];
 
-  const seoDescriptions = sections && sections[2]
-    ? sections[2].split('\n').filter(line => line.includes(':')).map(line => {
-        const descStart = line.indexOf(':') + 1;
-        return line.substring(descStart).trim();
-      })
+  const seoDescriptions = seoDescriptionsMatch
+    ? seoDescriptionsMatch[1].split('\n').filter(line => line.trim()).map(line => line.trim())
     : [];
 
-  return { seoTitles, marketingHooks, seoDescriptions };
+  const metaDescription = metaDescriptionMatch ? metaDescriptionMatch[1].trim() : '';
+
+  return { seoTitles, marketingHooks, seoDescriptions, metaDescription };
 }
 
 export function GeneratedContent({ content = { rawContent: "" } }: GeneratedContentProps) {
   const rawContent = content?.rawContent || "";
-  const { seoTitles, marketingHooks, seoDescriptions } = parseContent(rawContent);
+  const { seoTitles, marketingHooks, seoDescriptions, metaDescription } = parseContent(rawContent);
 
   console.log("Parsed SEO Titles:", seoTitles);
   console.log("Parsed Marketing Hooks:", marketingHooks);
   console.log("Parsed SEO Descriptions:", seoDescriptions);
-
-  const metaDescription = rawContent.match(/Meta Description\s*(.*)/)?.[1] || '';
+  console.log("Meta Description:", metaDescription);
 
   return (
     <div className="space-y-8">
