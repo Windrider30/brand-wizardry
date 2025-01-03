@@ -15,14 +15,16 @@ export function GeneratedContent({ content = {} }: GeneratedContentProps) {
     marketingHooks = [],
     seoDescriptions = [],
     metaDescription = '',
-    seoTitles = []
+    seoTitles = [],
   } = content;
 
   console.log("GeneratedContent received:", content);
+  console.log("SEO Titles:", seoTitles);
+  console.log("SEO Descriptions:", seoDescriptions);
 
   return (
     <div className="space-y-8">
-      {seoTitles.length > 0 && (
+      {seoTitles.length > 0 ? (
         <Card>
           <CardHeader>
             <CardTitle>SEO Title Options</CardTitle>
@@ -38,6 +40,8 @@ export function GeneratedContent({ content = {} }: GeneratedContentProps) {
             </div>
           </CardContent>
         </Card>
+      ) : (
+        <div>No SEO Titles available</div>
       )}
 
       {marketingHooks.length > 0 && (
@@ -58,7 +62,7 @@ export function GeneratedContent({ content = {} }: GeneratedContentProps) {
         </Card>
       )}
 
-      {seoDescriptions.length > 0 && (
+      {seoDescriptions.length > 0 ? (
         <Card>
           <CardHeader>
             <CardTitle>SEO Descriptions</CardTitle>
@@ -74,9 +78,11 @@ export function GeneratedContent({ content = {} }: GeneratedContentProps) {
             </div>
           </CardContent>
         </Card>
+      ) : (
+        <div>No SEO Descriptions available</div>
       )}
 
-      {metaDescription && (
+      {metaDescription ? (
         <Card>
           <CardHeader>
             <CardTitle>Meta Description</CardTitle>
@@ -85,7 +91,12 @@ export function GeneratedContent({ content = {} }: GeneratedContentProps) {
             <ContentSection content={metaDescription} />
           </CardContent>
         </Card>
+      ) : (
+        <div>No Meta Description available</div>
       )}
     </div>
+  );
+}
+
   );
 }
