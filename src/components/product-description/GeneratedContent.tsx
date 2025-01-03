@@ -10,7 +10,6 @@ interface GeneratedContentProps {
 function parseContent(rawContent: string) {
   if (!rawContent) return { seoTitles: [], marketingHooks: [], seoDescriptions: [], metaDescription: '' };
 
-  // Match sections using more precise patterns
   const seoTitlesMatch = rawContent.match(/1\. \*\*SEO Title Options\*\*([\s\S]*?)---/);
   const marketingHooksMatch = rawContent.match(/2\. \*\*Marketing Hooks\*\*([\s\S]*?)---/);
   const seoDescriptionsMatch = rawContent.match(/3\. \*\*SEO Descriptions\*\*([\s\S]*?)---/);
@@ -31,21 +30,6 @@ function parseContent(rawContent: string) {
   const metaDescription = metaDescriptionMatch ? metaDescriptionMatch[1].trim() : '';
 
   return { seoTitles, marketingHooks, seoDescriptions, metaDescription };
-}
-```
-
-### Full Component Code
-
-Incorporate the updated parsing code into your component:
-
-```typescript
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ContentSection } from "./ContentSection";
-
-interface GeneratedContentProps {
-  content?: {
-    rawContent?: string;
-  };
 }
 
 export function GeneratedContent({ content = { rawContent: "" } }: GeneratedContentProps) {
