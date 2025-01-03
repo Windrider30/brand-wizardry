@@ -1,48 +1,30 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ContentSection } from "./ContentSection";
 
 interface GeneratedContentProps {
-  content?: {
-    rawContent?: string;
+  content: {
+    marketingHooks: string[];
+    seoDescriptions: string[];
+    metaDescription: string;
+    seoTitles: string[];
   };
 }
 
-function parseContent(rawContent: string) {
-  if (!rawContent) return { seoTitles: [], marketingHooks: [], seoDescriptions: [], metaDescription: '' };
+export function GeneratedContent({ content = {} }: GeneratedContentProps) {
+  // Destructuring with default values to handle undefined properties
+  const {
+    marketingHooks = [],
+    seoDescriptions = [],
+    metaDescription = '',
+    seoTitles = [],
+  } = content;
 
-  const seoTitlesMatch = rawContent.match(/1\. \*\*SEO Title Options\*\*([\s\S]*?)---/);
-  const marketingHooksMatch = rawContent.match(/2\. \*\*Marketing Hooks\*\*([\s\S]*?)---/);
-  const seoDescriptionsMatch = rawContent.match(/3\. \*\*SEO Descriptions\*\*([\s\S]*?)---/);
-  const metaDescriptionMatch = rawContent.match(/\*\*4\. Meta Description\*\*\n\s*(.*)/);
-
-  const seoTitles = seoTitlesMatch
-    ? seoTitlesMatch[1].split('\n').filter(line => line.includes('"')).map(line => line.match(/"(.*?)"/)?.[1] || '')
-    : [];
-
-  const marketingHooks = marketingHooksMatch
-    ? marketingHooksMatch[1].split('\n').filter(line => line.includes('"')).map(line => line.match(/"(.*?)"/)?.[1] || '')
-    : [];
-
-  const seoDescriptions = seoDescriptionsMatch
-    ? seoDescriptionsMatch[1].split('\n').filter(line => line.trim() && !line.startsWith('-')).map(line => line.trim())
-    : [];
-
-  const metaDescription = metaDescriptionMatch ? metaDescriptionMatch[1].trim() : '';
-
-  return { seoTitles, marketingHooks, seoDescriptions, metaDescription };
-}
-
-export function GeneratedContent({ content = { rawContent: "" } }: GeneratedContentProps) {
-  const rawContent = content?.rawContent || "";
-  const { seoTitles, marketingHooks, seoDescriptions, metaDescription } = parseContent(rawContent);
-
-  console.log("Parsed SEO Titles:", seoTitles);
-  console.log("Parsed Marketing Hooks:", marketingHooks);
-  console.log("Parsed SEO Descriptions:", seoDescriptions);
-  console.log("Meta Description:", metaDescription);
+  console.log("GeneratedContent received:", content);
 
   return (
     <div className="space-y-8">
+      {/* SEO Titles */}
       {seoTitles.length > 0 && (
         <Card>
           <CardHeader>
@@ -63,6 +45,7 @@ export function GeneratedContent({ content = { rawContent: "" } }: GeneratedCont
         </Card>
       )}
 
+      {/* Marketing Hooks */}
       {marketingHooks.length > 0 && (
         <Card>
           <CardHeader>
@@ -83,6 +66,7 @@ export function GeneratedContent({ content = { rawContent: "" } }: GeneratedCont
         </Card>
       )}
 
+      {/* SEO Descriptions */}
       {seoDescriptions.length > 0 && (
         <Card>
           <CardHeader>
@@ -103,6 +87,7 @@ export function GeneratedContent({ content = { rawContent: "" } }: GeneratedCont
         </Card>
       )}
 
+      {/* Meta Description */}
       {metaDescription && (
         <Card>
           <CardHeader>
