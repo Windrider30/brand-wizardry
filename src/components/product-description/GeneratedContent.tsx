@@ -11,6 +11,7 @@ interface GeneratedContentProps {
 }
 
 export function GeneratedContent({ content = {} }: GeneratedContentProps) {
+  // Destructuring with default values to handle undefined properties
   const {
     marketingHooks = [],
     seoDescriptions = [],
@@ -19,12 +20,11 @@ export function GeneratedContent({ content = {} }: GeneratedContentProps) {
   } = content;
 
   console.log("GeneratedContent received:", content);
-  console.log("SEO Titles:", seoTitles);
-  console.log("SEO Descriptions:", seoDescriptions);
 
   return (
     <div className="space-y-8">
-      {seoTitles.length > 0 ? (
+      {/* SEO Titles */}
+      {seoTitles.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>SEO Title Options</CardTitle>
@@ -33,17 +33,18 @@ export function GeneratedContent({ content = {} }: GeneratedContentProps) {
             <div className="space-y-4">
               {seoTitles.map((title, index) => (
                 <div key={index} className="space-y-2">
-                  <h3 className="font-medium text-sm text-muted-foreground">Version {index + 1}</h3>
+                  <h3 className="font-medium text-sm text-muted-foreground">
+                    Version {index + 1}
+                  </h3>
                   <ContentSection content={title} />
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
-      ) : (
-        <div>No SEO Titles available</div>
       )}
 
+      {/* Marketing Hooks */}
       {marketingHooks.length > 0 && (
         <Card>
           <CardHeader>
@@ -53,7 +54,9 @@ export function GeneratedContent({ content = {} }: GeneratedContentProps) {
             <div className="space-y-4">
               {marketingHooks.map((hook, index) => (
                 <div key={index} className="space-y-2">
-                  <h3 className="font-medium text-sm text-muted-foreground">Hook {index + 1}</h3>
+                  <h3 className="font-medium text-sm text-muted-foreground">
+                    Hook {index + 1}
+                  </h3>
                   <ContentSection content={hook} />
                 </div>
               ))}
@@ -62,7 +65,8 @@ export function GeneratedContent({ content = {} }: GeneratedContentProps) {
         </Card>
       )}
 
-      {seoDescriptions.length > 0 ? (
+      {/* SEO Descriptions */}
+      {seoDescriptions.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>SEO Descriptions</CardTitle>
@@ -71,18 +75,19 @@ export function GeneratedContent({ content = {} }: GeneratedContentProps) {
             <div className="space-y-6">
               {seoDescriptions.map((description, index) => (
                 <div key={index} className="space-y-2">
-                  <h3 className="font-medium text-sm text-muted-foreground">Version {index + 1}</h3>
+                  <h3 className="font-medium text-sm text-muted-foreground">
+                    Version {index + 1}
+                  </h3>
                   <ContentSection content={description} />
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
-      ) : (
-        <div>No SEO Descriptions available</div>
       )}
 
-      {metaDescription ? (
+      {/* Meta Description */}
+      {metaDescription && (
         <Card>
           <CardHeader>
             <CardTitle>Meta Description</CardTitle>
@@ -91,12 +96,7 @@ export function GeneratedContent({ content = {} }: GeneratedContentProps) {
             <ContentSection content={metaDescription} />
           </CardContent>
         </Card>
-      ) : (
-        <div>No Meta Description available</div>
       )}
     </div>
-  );
-}
-
   );
 }
