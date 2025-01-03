@@ -8,32 +8,44 @@ interface GeneratedContentProps {
 }
 
 function parseContent(rawContent: string) {
-  if (!rawContent) return { seoTitles: [], marketingHooks: [], seoDescriptions: [] };
+  if (!rawContent) return { seoTitles: [], marketingHooks: [], seoDescriptions: [], metaDescription: '' };
 
-  // Use regex to split and match each section
-  const seoTitlesMatch = rawContent.match(/SEO Title Options([\s\S]*?)---/);
-  const marketingHooksMatch = rawContent.match(/Marketing Hooks([\s\S]*?)---/);
-  const seoDescriptionsMatch = rawContent.match(/SEO Descriptions([\s\S]*?)---/);
-  const metaDescriptionMatch = rawContent.match(/Meta Description\s*(.*)/);
+  // Match sections using more precise patterns
+  const seoTitlesMatch = rawContent.match(/1\. \*\*SEO Title Options\*\*([\s\S]*?)---/);
+  const marketingHooksMatch = rawContent.match(/2\. \*\*Marketing Hooks\*\*([\s\S]*?)---/);
+  const seoDescriptionsMatch = rawContent.match(/3\. \*\*SEO Descriptions\*\*([\s\S]*?)---/);
+  const metaDescriptionMatch = rawContent.match(/\*\*4\. Meta Description\*\*\n\s*(.*)/);
 
   const seoTitles = seoTitlesMatch
-    ? seoTitlesMatch[1].match(/"(.*?)"/g)?.map(item => item.slice(1, -1)) || []
+    ? seoTitlesMatch[1].split('\n').filter(line => line.includes('"')).map(line => line.match(/"(.*?)"/)?.[1] || '')
     : [];
 
   const marketingHooks = marketingHooksMatch
-    ? marketingHooksMatch[1].split('\n').filter(line => line.includes('"')).map(line => {
-        const hookMatch = line.match(/"(.*?)"/);
-        return hookMatch ? hookMatch[1] : '';
-      })
+    ? marketingHooksMatch[1].split('\n').filter(line => line.includes('"')).map(line => line.match(/"(.*?)"/)?.[1] || '')
     : [];
 
   const seoDescriptions = seoDescriptionsMatch
-    ? seoDescriptionsMatch[1].split('\n').filter(line => line.trim()).map(line => line.trim())
+    ? seoDescriptionsMatch[1].split('\n').filter(line => line.trim() && !line.startsWith('-')).map(line => line.trim())
     : [];
 
   const metaDescription = metaDescriptionMatch ? metaDescriptionMatch[1].trim() : '';
 
   return { seoTitles, marketingHooks, seoDescriptions, metaDescription };
+}
+```
+
+### Full Component Code
+
+Incorporate the updated parsing code into your component:
+
+```typescript
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ContentSection } from "./ContentSection";
+
+interface GeneratedContentProps {
+  content?: {
+    rawContent?: string;
+  };
 }
 
 export function GeneratedContent({ content = { rawContent: "" } }: GeneratedContentProps) {
