@@ -1,3 +1,4 @@
+```javascript
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ContentSection } from "./ContentSection";
 
@@ -10,13 +11,25 @@ interface GeneratedContentProps {
 function parseContent(rawContent: string) {
   if (!rawContent) return { seoTitles: [], marketingHooks: [], seoDescriptions: [] };
 
-  const sections = rawContent.split('---');
-  const seoTitles = sections[1]?.split('\n').filter(line => line.includes('"')).map(item => item.trim().replace(/"/g, '')) || [];
-  const marketingHooks = sections[2]?.split('\n').filter(line => line.includes(':')).map(line => line.split(':')[1].trim()) || [];
-  const seoDescriptions = sections[3]?.split('\n').filter(line => line.startsWith('**Description')).map((_, index, array) => {
-    const descStart = array[index].indexOf(':') + 1;
-    return array[index].substring(descStart).trim();
-  }) || [];
+  const sections = rawContent.match(/[\s\S]*?---/g);
+
+  const seoTitles = sections && sections[0]
+    ? sections[0].match(/"(.*?)"/g)?.map(item => item.slice(1, -1)) || []
+    : [];
+
+  const marketingHooks = sections && sections[1]
+    ? sections[1].split('\n').filter(line => line.includes('"')).map(line => {
+        const hookMatch = line.match(/"(.*?)"/);
+        return hookMatch ? hookMatch[1] : '';
+      })
+    : [];
+
+  const seoDescriptions = sections && sections[2]
+    ? sections[2].split('\n').filter(line => line.includes(':')).map(line => {
+        const descStart = line.indexOf(':') + 1;
+        return line.substring(descStart).trim();
+      })
+    : [];
 
   return { seoTitles, marketingHooks, seoDescriptions };
 }
@@ -29,7 +42,7 @@ export function GeneratedContent({ content = { rawContent: "" } }: GeneratedCont
   console.log("Parsed Marketing Hooks:", marketingHooks);
   console.log("Parsed SEO Descriptions:", seoDescriptions);
 
-  const metaDescription = rawContent.split('Meta Description')[1]?.trim() || '';
+  const metaDescription = rawContent.match(/Meta Description\s*(.*)/)?.[1] || '';
 
   return (
     <div className="space-y-8">
@@ -106,3 +119,4 @@ export function GeneratedContent({ content = { rawContent: "" } }: GeneratedCont
     </div>
   );
 }
+```
