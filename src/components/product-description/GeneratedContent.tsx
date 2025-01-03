@@ -2,12 +2,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ContentSection } from "./ContentSection";
 
 interface GeneratedContentProps {
-  content: {
-    rawContent: string;
+  content?: {
+    rawContent?: string;
   };
 }
 
 function parseContent(rawContent: string) {
+  if (!rawContent) return { seoTitles: [], marketingHooks: [], seoDescriptions: [] };
+
   const sections = rawContent.split('---');
   const seoTitles = sections[1]?.match(/"(.*?)"/g)?.map(item => item.replace(/"/g, '')) || [];
   const marketingHooks = sections[2]?.split('\n').filter(line => line.trim() !== '').map(line => line.trim()) || [];
@@ -17,7 +19,7 @@ function parseContent(rawContent: string) {
 }
 
 export function GeneratedContent({ content = { rawContent: "" } }: GeneratedContentProps) {
-  const { rawContent } = content;
+  const rawContent = content?.rawContent || ""; // Safeguard against undefined
   const { seoTitles, marketingHooks, seoDescriptions } = parseContent(rawContent);
 
   console.log("Parsed SEO Titles:", seoTitles);
