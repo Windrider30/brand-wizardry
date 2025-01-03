@@ -1,4 +1,3 @@
-```javascript
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ContentSection } from "./ContentSection";
 
@@ -119,4 +118,3 @@ export function GeneratedContent({ content = { rawContent: "" } }: GeneratedCont
     </div>
   );
 }
-```
