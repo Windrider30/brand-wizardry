@@ -11,15 +11,18 @@ function parseContent(rawContent: string) {
   if (!rawContent) return { seoTitles: [], marketingHooks: [], seoDescriptions: [] };
 
   const sections = rawContent.split('---');
-  const seoTitles = sections[1]?.match(/"(.*?)"/g)?.map(item => item.replace(/"/g, '')) || [];
-  const marketingHooks = sections[2]?.split('\n').filter(line => line.trim() !== '').map(line => line.trim()) || [];
-  const seoDescriptions = sections[3]?.match(/(.*?\n)+/g)?.map(desc => desc.replace(/\s+/g, ' ').trim()) || [];
+  const seoTitles = sections[1]?.split('\n').filter(line => line.includes('"')).map(item => item.trim().replace(/"/g, '')) || [];
+  const marketingHooks = sections[2]?.split('\n').filter(line => line.includes(':')).map(line => line.split(':')[1].trim()) || [];
+  const seoDescriptions = sections[3]?.split('\n').filter(line => line.startsWith('**Description')).map((_, index, array) => {
+    const descStart = array[index].indexOf(':') + 1;
+    return array[index].substring(descStart).trim();
+  }) || [];
 
   return { seoTitles, marketingHooks, seoDescriptions };
 }
 
 export function GeneratedContent({ content = { rawContent: "" } }: GeneratedContentProps) {
-  const rawContent = content?.rawContent || ""; // Safeguard against undefined
+  const rawContent = content?.rawContent || "";
   const { seoTitles, marketingHooks, seoDescriptions } = parseContent(rawContent);
 
   console.log("Parsed SEO Titles:", seoTitles);
