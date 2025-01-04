@@ -10,14 +10,14 @@ interface GeneratedContentProps {
   };
 }
 
-export function GeneratedContent({ content = {} }: GeneratedContentProps) {
+export function GeneratedContent({ content }: GeneratedContentProps) {
   // Destructuring with default values to handle undefined properties
   const {
     marketingHooks = [],
     seoDescriptions = [],
     metaDescription = '',
     seoTitles = [],
-  } = content;
+  } = content || { marketingHooks: [], seoDescriptions: [], metaDescription: '', seoTitles: [] };
 
   console.log("GeneratedContent received:", content);
 
