@@ -3,24 +3,24 @@ import { ContentSection } from "./ContentSection";
 
 interface GeneratedContentProps {
   content: {
-    marketingHooks: string[];
-    seoDescriptions: string[];
-    metaDescription: string;
-    seoTitles: string[];
+    marketingHooks?: string[];
+    seoDescriptions?: string[];
+    metaDescription?: string;
+    seoTitles?: string[];
   };
 }
 
-export function GeneratedContent({ content = {} }: GeneratedContentProps) {
+export function GeneratedContent({ content }: GeneratedContentProps) {
   // Destructuring with default values to handle undefined properties
   const {
     marketingHooks = [],
     seoDescriptions = [],
     metaDescription = '',
     seoTitles = [],
-  } = content;
+  } = content || {};
 
   console.log("GeneratedContent received:", content);
-  console.log("SEO Titles:", seoTitles); // Add this line to debug SEO titles
+  console.log("SEO Titles:", seoTitles);
 
   return (
     <div className="space-y-8">
@@ -46,7 +46,7 @@ export function GeneratedContent({ content = {} }: GeneratedContentProps) {
       )}
 
       {/* Marketing Hooks */}
-      {marketingHooks.length > 0 && (
+      {Array.isArray(marketingHooks) && marketingHooks.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Marketing Hooks</CardTitle>
@@ -67,7 +67,7 @@ export function GeneratedContent({ content = {} }: GeneratedContentProps) {
       )}
 
       {/* SEO Descriptions */}
-      {seoDescriptions.length > 0 && (
+      {Array.isArray(seoDescriptions) && seoDescriptions.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>SEO Descriptions</CardTitle>
