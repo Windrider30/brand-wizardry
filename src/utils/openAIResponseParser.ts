@@ -2,7 +2,7 @@ interface ParsedProductDescription {
   marketingHooks: string[];
   seoDescriptions: string[];
   metaDescription: string;
-  newTitle: string;
+  seoTitles: string[];
 }
 
 export function parseProductDescription(content: string): ParsedProductDescription {
@@ -12,7 +12,7 @@ export function parseProductDescription(content: string): ParsedProductDescripti
     marketingHooks: [],
     seoDescriptions: [],
     metaDescription: "",
-    newTitle: ""
+    seoTitles: []
   };
 
   try {
@@ -45,11 +45,9 @@ export function parseProductDescription(content: string): ParsedProductDescripti
             if (!cleanSection.includes("SEO Title Options")) {
               const titles = cleanSection
                 .split('\n')
-                .map(line => line.replace(/^\d+\.\s*"|"$/g, '').trim())
+                .map(line => line.replace(/^\d+\.\s*/, '').trim())
                 .filter(title => title && !title.includes("SEO Title Options"));
-              if (titles.length > 0) {
-                result.newTitle = titles.join('\n');
-              }
+              result.seoTitles.push(...titles);
             }
             break;
             
@@ -57,8 +55,7 @@ export function parseProductDescription(content: string): ParsedProductDescripti
             if (!cleanSection.includes("Marketing Hooks")) {
               const hook = cleanSection
                 .replace(/^\d+\.\s*/, '')
-                .replace(/\*\*.*?\*\*:\s*/, '')
-                .replace(/^"|"$/g, '')
+                .replace(/^["']|["']$/g, '')
                 .trim();
               if (hook) {
                 result.marketingHooks.push(hook);
@@ -67,7 +64,7 @@ export function parseProductDescription(content: string): ParsedProductDescripti
             break;
             
           case "descriptions":
-            if (cleanSection.startsWith("**Version")) {
+            if (cleanSection.startsWith("Version") || cleanSection.match(/^\d+\./)) {
               if (currentDescription) {
                 result.seoDescriptions.push(currentDescription.trim());
               }
@@ -83,7 +80,9 @@ export function parseProductDescription(content: string): ParsedProductDescripti
             
           case "meta":
             if (!cleanSection.includes("Meta Description")) {
-              const meta = cleanSection.replace(/^"|"$/g, '').trim();
+              const meta = cleanSection
+                .replace(/^["']|["']$/g, '')
+                .trim();
               if (meta) {
                 result.metaDescription = meta;
               }

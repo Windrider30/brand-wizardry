@@ -12,7 +12,7 @@ export interface ProductDescriptionResponse {
   marketingHooks: string[];
   seoDescriptions: string[];
   metaDescription: string;
-  seoTitles: string;
+  seoTitles: string[];
 }
 
 export async function generateProductDescription(productInfo: ProductInfo): Promise<ProductDescriptionResponse | null> {
