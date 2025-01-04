@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ContentSection } from "./ContentSection";
 
@@ -21,11 +20,12 @@ export function GeneratedContent({ content = {} }: GeneratedContentProps) {
   } = content;
 
   console.log("GeneratedContent received:", content);
+  console.log("SEO Titles:", seoTitles); // Add this line to debug SEO titles
 
   return (
     <div className="space-y-8">
       {/* SEO Titles */}
-      {seoTitles.length > 0 && (
+      {Array.isArray(seoTitles) && seoTitles.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>SEO Title Options</CardTitle>
