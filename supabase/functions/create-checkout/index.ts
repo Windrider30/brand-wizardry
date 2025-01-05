@@ -30,7 +30,14 @@ serve(async (req) => {
     // Get the authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      throw new Error('No authorization header');
+      console.error('No authorization header provided');
+      return new Response(
+        JSON.stringify({ error: 'No authorization header' }),
+        { 
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     // Create Supabase client
@@ -45,7 +52,14 @@ serve(async (req) => {
     );
 
     if (userError || !user) {
-      throw new Error('Invalid user token');
+      console.error('Invalid user token:', userError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid user token' }),
+        { 
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     // Get the tier and duration from the request
@@ -53,11 +67,25 @@ serve(async (req) => {
     console.log('Received request for tier:', tier, 'duration:', duration);
     
     if (!tier || !duration) {
-      throw new Error('Tier and duration are required');
+      console.error('Missing tier or duration');
+      return new Response(
+        JSON.stringify({ error: 'Tier and duration are required' }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     if (!PRICE_IDS[tier] || !PRICE_IDS[tier][duration]) {
-      throw new Error('Invalid tier or duration');
+      console.error('Invalid tier or duration:', { tier, duration });
+      return new Response(
+        JSON.stringify({ error: 'Invalid tier or duration' }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -76,6 +104,11 @@ serve(async (req) => {
       mode: 'subscription',
       success_url: `${req.headers.get('origin')}/dashboard?success=true`,
       cancel_url: `${req.headers.get('origin')}/?canceled=true`,
+      metadata: {
+        user_id: user.id,
+        tier,
+        duration
+      }
     });
 
     console.log('Checkout session created:', session.id);
