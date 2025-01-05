@@ -47,10 +47,6 @@ export function PricingCard({ title, price, features, tier, duration }: PricingC
         return;
       }
 
-      // Get the authorization token
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user found');
-
       console.log('Creating checkout session for:', { tier, duration });
       
       const { data, error } = await supabase.functions.invoke('create-checkout', {
@@ -58,9 +54,6 @@ export function PricingCard({ title, price, features, tier, duration }: PricingC
           tier, 
           duration,
           returnUrl: window.location.origin
-        },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
         }
       });
 
