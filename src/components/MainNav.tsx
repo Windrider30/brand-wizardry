@@ -21,7 +21,7 @@ export function MainNav() {
           .select('*')
           .eq('user_id', session.user.id)
           .eq('status', 'active')
-          .single();
+          .maybeSingle();
 
         setHasSubscription(!!subscription);
       }
@@ -40,7 +40,7 @@ export function MainNav() {
           .select('*')
           .eq('user_id', session.user.id)
           .eq('status', 'active')
-          .single();
+          .maybeSingle();
 
         setHasSubscription(!!subscription);
       } else {

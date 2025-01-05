@@ -20,16 +20,16 @@ export const SubscriptionCheck = ({ children }: { children: React.ReactNode }) =
           return;
         }
 
-        const { data: subscriptions, error } = await supabase
+        const { data: subscription, error } = await supabase
           .from('subscriptions')
           .select('*')
           .eq('user_id', session.user.id)
           .eq('status', 'active')
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
         
-        setHasSubscription(!!subscriptions);
+        setHasSubscription(!!subscription);
       } catch (error) {
         console.error('Error checking subscription:', error);
         toast({
