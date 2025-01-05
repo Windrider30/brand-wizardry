@@ -23,8 +23,8 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
         description: "You have been logged out of your account",
       });
 
-      // Navigate to login page
-      navigate('/login');
+      // Force a page reload to clear all state
+      window.location.href = '/login';
     } catch (error) {
       console.error('Logout error:', error);
       toast({
