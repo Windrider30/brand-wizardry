@@ -14,13 +14,18 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
-      navigate('/login');
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      // Force navigation to login page
+      window.location.href = '/login';
+      
       toast({
         title: "Logged out successfully",
         description: "You have been logged out of your account",
       });
     } catch (error) {
+      console.error('Logout error:', error);
       toast({
         title: "Error logging out",
         description: "There was a problem logging out. Please try again.",
