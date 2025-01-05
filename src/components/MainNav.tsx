@@ -7,20 +7,46 @@ import { useToast } from "./ui/use-toast";
 
 export function MainNav() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [hasSubscription, setHasSubscription] = useState<boolean>(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check for existing session on mount
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
-    });
 
-    // Subscribe to auth changes
+      if (session) {
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .eq('status', 'active')
+          .single();
+
+        setHasSubscription(!!subscription);
+      }
+    };
+
+    checkAuth();
+
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setIsAuthenticated(!!session);
+      
+      if (session) {
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .eq('status', 'active')
+          .single();
+
+        setHasSubscription(!!subscription);
+      } else {
+        setHasSubscription(false);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -55,7 +81,7 @@ export function MainNav() {
           <span className="text-2xl font-bold">Brand Forge Foundry</span>
         </Link>
         <div className="ml-auto flex items-center space-x-4 overflow-x-auto">
-          {isAuthenticated && (
+          {isAuthenticated && hasSubscription && (
             <>
               <Link to="/brand-bible">
                 <Button variant="ghost" className="text-lg">Brand Bible</Button>

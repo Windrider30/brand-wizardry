@@ -1,45 +1,81 @@
-import { RouteObject } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { SubscriptionCheck } from "@/components/auth/SubscriptionCheck";
 import Index from "@/pages/Index";
+import Login from "@/pages/Login";
 import BrandBible from "@/pages/BrandBible";
-import ProductDescription from "@/pages/ProductDescription";
 import SocialPosts from "@/pages/SocialPosts";
+import ProductDescription from "@/pages/ProductDescription";
 import EmailContent from "@/pages/EmailContent";
 import AdGeneration from "@/pages/AdGeneration";
 import SeoArticle from "@/pages/SeoArticle";
-import Login from "@/pages/Login";
 
-export const routes: RouteObject[] = [
-  {
-    path: "/login",
-    element: <Login />
-  },
+export const routes = [
   {
     path: "/",
-    element: <ProtectedRoute><Index /></ProtectedRoute>
+    element: <Index />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
   },
   {
     path: "/brand-bible",
-    element: <ProtectedRoute><BrandBible /></ProtectedRoute>
-  },
-  {
-    path: "/product-description",
-    element: <ProtectedRoute><ProductDescription /></ProtectedRoute>
+    element: (
+      <ProtectedRoute>
+        <SubscriptionCheck>
+          <BrandBible />
+        </SubscriptionCheck>
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/social-posts",
-    element: <ProtectedRoute><SocialPosts /></ProtectedRoute>
+    element: (
+      <ProtectedRoute>
+        <SubscriptionCheck>
+          <SocialPosts />
+        </SubscriptionCheck>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/product-description",
+    element: (
+      <ProtectedRoute>
+        <SubscriptionCheck>
+          <ProductDescription />
+        </SubscriptionCheck>
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/email-content",
-    element: <ProtectedRoute><EmailContent /></ProtectedRoute>
+    element: (
+      <ProtectedRoute>
+        <SubscriptionCheck>
+          <EmailContent />
+        </SubscriptionCheck>
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/ad-generation",
-    element: <ProtectedRoute><AdGeneration /></ProtectedRoute>
+    element: (
+      <ProtectedRoute>
+        <SubscriptionCheck>
+          <AdGeneration />
+        </SubscriptionCheck>
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/seo-article",
-    element: <ProtectedRoute><SeoArticle /></ProtectedRoute>
-  }
+    element: (
+      <ProtectedRoute>
+        <SubscriptionCheck>
+          <SeoArticle />
+        </SubscriptionCheck>
+      </ProtectedRoute>
+    ),
+  },
 ];
