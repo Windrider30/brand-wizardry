@@ -10,14 +10,14 @@ const corsHeaders = {
 // Define price IDs for different tiers and durations
 const PRICE_IDS = {
   beginner: {
-    monthly: 'price_1OeQXlLxJvZj1YRxFRXGGtEe',
-    quarterly: 'price_1OeQXlLxJvZj1YRxFRXGGtEe',
-    yearly: 'price_1OeQXlLxJvZj1YRxFRXGGtEe'
+    monthly: 'price_1QYafILRjAwduTkvPkjXCk7w',
+    quarterly: 'price_1QYagaLRjAwduTkvcgC3Wlmo',
+    yearly: 'price_1QYahnLRjAwduTkveEalkYJA'
   },
   professional: {
-    monthly: 'price_1OeQXlLxJvZj1YRxFRXGGtEe',
-    quarterly: 'price_1OeQXlLxJvZj1YRxFRXGGtEe',
-    yearly: 'price_1OeQXlLxJvZj1YRxFRXGGtEe'
+    monthly: 'price_1QYainLRjAwduTkvLC752ARg',
+    quarterly: 'price_1QYajcLRjAwduTkvGHt7Hi2J',
+    yearly: 'price_1QYakPLRjAwduTkvJr89VdyC'
   }
 };
 
@@ -79,7 +79,7 @@ serve(async (req) => {
     }
 
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
-    console.log('Stripe key exists:', !!stripeKey); // Log if key exists without exposing it
+    console.log('Stripe key exists:', !!stripeKey);
 
     if (!stripeKey) {
       console.error('Stripe secret key not found in environment');
