@@ -7,6 +7,20 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Define price IDs for different tiers and durations
+const PRICE_IDS = {
+  beginner: {
+    monthly: 'price_1OeQXlLxJvZj1YRxFRXGGtEe',
+    quarterly: 'price_1OeQXlLxJvZj1YRxFRXGGtEe',
+    yearly: 'price_1OeQXlLxJvZj1YRxFRXGGtEe'
+  },
+  professional: {
+    monthly: 'price_1OeQXlLxJvZj1YRxFRXGGtEe',
+    quarterly: 'price_1OeQXlLxJvZj1YRxFRXGGtEe',
+    yearly: 'price_1OeQXlLxJvZj1YRxFRXGGtEe'
+  }
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -50,7 +64,7 @@ serve(async (req) => {
     }
 
     // Get the tier and duration from the request
-    const { tier, duration } = await req.json();
+    const { tier, duration, returnUrl } = await req.json();
     console.log('Received request for tier:', tier, 'duration:', duration);
     
     if (!tier || !duration) {
@@ -82,12 +96,24 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
+    // Get the appropriate price ID
+    const priceId = PRICE_IDS[tier]?.[duration];
+    if (!priceId) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid tier or duration' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        }
+      );
+    }
+
     console.log('Creating checkout session...');
     const session = await stripe.checkout.sessions.create({
       customer_email: user.email,
       line_items: [
         {
-          price: PRICE_IDS[tier][duration],
+          price: priceId,
           quantity: 1,
         },
       ],
