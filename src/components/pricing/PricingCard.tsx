@@ -44,19 +44,15 @@ export function PricingCard({ title, price, features, tier, duration }: PricingC
         return;
       }
 
-      const response = await fetch('/api/create-checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ tier, duration }),
+      // Call the Supabase Edge Function instead of a direct API endpoint
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { tier, duration },
       });
 
-      const { url } = await response.json();
-      if (url) {
-        window.location.href = url;
-      }
+      if (error) throw error;
+      if (!data?.url) throw new Error('No checkout URL received');
+
+      window.location.href = data.url;
     } catch (error) {
       console.error('Error creating checkout session:', error);
       toast({
