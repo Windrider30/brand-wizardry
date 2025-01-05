@@ -1,11 +1,11 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from 'https://esm.sh/stripe@14.21.0'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
+import Stripe from 'https://esm.sh/stripe@14.21.0';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
 
 const PRICE_IDS = {
   professional: {
@@ -18,70 +18,55 @@ const PRICE_IDS = {
     quarterly: 'price_1QYagaLRjAwduTkvcgC3Wlmo',
     monthly: 'price_1QYafILRjAwduTkvPkjXCk7w'
   }
-}
+};
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-  )
-
   try {
+    // Get the authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('No authorization header');
+    }
+
+    // Create Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    );
+
+    // Get the user from the token
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    );
+
+    if (userError || !user) {
+      throw new Error('Invalid user token');
+    }
+
     // Get the tier and duration from the request
-    const { tier, duration } = await req.json()
+    const { tier, duration } = await req.json();
+    console.log('Received request for tier:', tier, 'duration:', duration);
     
     if (!tier || !duration) {
-      throw new Error('Tier and duration are required')
+      throw new Error('Tier and duration are required');
     }
 
     if (!PRICE_IDS[tier] || !PRICE_IDS[tier][duration]) {
-      throw new Error('Invalid tier or duration')
-    }
-
-    // Get the session or user object
-    const authHeader = req.headers.get('Authorization')!
-    const token = authHeader.replace('Bearer ', '')
-    const { data } = await supabaseClient.auth.getUser(token)
-    const user = data.user
-    const email = user?.email
-
-    if (!email) {
-      throw new Error('No email found')
+      throw new Error('Invalid tier or duration');
     }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
-    })
+    });
 
-    const customers = await stripe.customers.list({
-      email: email,
-      limit: 1
-    })
-
-    let customer_id = undefined
-    if (customers.data.length > 0) {
-      customer_id = customers.data[0].id
-      // check if already subscribed
-      const subscriptions = await stripe.subscriptions.list({
-        customer: customers.data[0].id,
-        status: 'active',
-        limit: 1
-      })
-
-      if (subscriptions.data.length > 0) {
-        throw new Error("Customer already has an active subscription")
-      }
-    }
-
-    console.log('Creating payment session...')
+    console.log('Creating checkout session...');
     const session = await stripe.checkout.sessions.create({
-      customer: customer_id,
-      customer_email: customer_id ? undefined : email,
+      customer_email: user.email,
       line_items: [
         {
           price: PRICE_IDS[tier][duration],
@@ -90,25 +75,25 @@ serve(async (req) => {
       ],
       mode: 'subscription',
       success_url: `${req.headers.get('origin')}/dashboard?success=true`,
-      cancel_url: `${req.headers.get('origin')}/pricing?canceled=true`,
-    })
+      cancel_url: `${req.headers.get('origin')}/?canceled=true`,
+    });
 
-    console.log('Payment session created:', session.id)
+    console.log('Checkout session created:', session.id);
     return new Response(
       JSON.stringify({ url: session.url }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       }
-    )
+    );
   } catch (error) {
-    console.error('Error creating payment session:', error)
+    console.error('Error creating checkout session:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
       }
-    )
+    );
   }
-})
+});
