@@ -84,7 +84,7 @@ const Index = () => {
 
         <PolicySection />
 
-        <div className="mt-12 md:mt-16 text-xs md:text-sm text-gray-500">
+        <div className="mt-12 md:mt-16 text-xs md:text-sm text-black">
           Powered by EcomCavalry
         </div>
       </div>
