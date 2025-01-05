@@ -3,12 +3,12 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { PolicySection } from "@/components/home/PolicySection";
 
 const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is already logged in
     supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
         navigate("/");
@@ -39,6 +39,7 @@ const Login = () => {
           providers={[]}
         />
       </div>
+      <PolicySection />
     </div>
   );
 };

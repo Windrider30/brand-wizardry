@@ -3,6 +3,7 @@ import { FeaturesGrid } from "@/components/home/FeaturesGrid";
 import { PricingCard } from "@/components/pricing/PricingCard";
 import { DurationToggle } from "@/components/pricing/DurationToggle";
 import { CancelSubscription } from "@/components/home/CancelSubscription";
+import { PolicySection } from "@/components/home/PolicySection";
 
 const Index = () => {
   const [duration, setDuration] = useState<'monthly' | 'quarterly' | 'yearly'>('monthly');
@@ -58,7 +59,6 @@ const Index = () => {
         
         <FeaturesGrid />
 
-        {/* Pricing Section */}
         <div className="mt-20">
           <h2 className="text-3xl font-bold mb-12">Choose Your Plan</h2>
           <DurationToggle duration={duration} onDurationChange={setDuration} />
@@ -81,6 +81,8 @@ const Index = () => {
         </div>
 
         <CancelSubscription />
+
+        <PolicySection />
 
         <div className="mt-12 md:mt-16 text-xs md:text-sm text-gray-500">
           Powered by EcomCavalry
