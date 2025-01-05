@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { LogOut, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "../ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 interface AuthButtonsProps {
   isAuthenticated: boolean;
@@ -14,23 +14,17 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
 
   const handleLogout = async () => {
     try {
-      // First, sign out from Supabase
-      await supabase.auth.signOut();
-      
-      // Clear all storage
-      localStorage.clear();
-      sessionStorage.clear();
-      
-      // Show success toast
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+
+      // Show success message
       toast({
         title: "Logged out successfully",
         description: "You have been logged out of your account",
       });
 
-      // Force a complete reload and redirect
-      setTimeout(() => {
-        window.location.replace('/login');
-      }, 100);
+      // Navigate to login page
+      navigate('/login');
     } catch (error) {
       console.error('Logout error:', error);
       toast({

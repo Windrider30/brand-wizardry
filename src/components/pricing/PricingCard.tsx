@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface PricingFeature {
   name: string;
@@ -19,6 +20,7 @@ interface PricingCardProps {
 
 export function PricingCard({ title, price, features, tier, duration }: PricingCardProps) {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const getBillingPeriod = () => {
     switch (duration) {
@@ -41,17 +43,28 @@ export function PricingCard({ title, price, features, tier, duration }: PricingC
           description: "Please log in to subscribe to a plan",
           variant: "destructive",
         });
+        navigate('/login');
         return;
       }
 
-      // Call the Supabase Edge Function instead of a direct API endpoint
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { tier, duration },
+        body: { 
+          tier, 
+          duration,
+          returnUrl: window.location.origin
+        }
       });
 
-      if (error) throw error;
-      if (!data?.url) throw new Error('No checkout URL received');
+      if (error) {
+        console.error('Checkout error:', error);
+        throw error;
+      }
 
+      if (!data?.url) {
+        throw new Error('No checkout URL received');
+      }
+
+      // Redirect to Stripe checkout
       window.location.href = data.url;
     } catch (error) {
       console.error('Error creating checkout session:', error);
