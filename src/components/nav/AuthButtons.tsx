@@ -14,16 +14,20 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
 
   const handleLogout = async () => {
     try {
+      // First clear any existing session
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+
+      // Clear any local storage data
+      localStorage.clear();
 
       toast({
         title: "Logged out successfully",
         description: "You have been logged out of your account",
       });
 
-      // Navigate to login page after logout
-      navigate('/login');
+      // Force a complete page reload to clear all state
+      window.location.href = '/login';
     } catch (error) {
       console.error('Logout error:', error);
       toast({
