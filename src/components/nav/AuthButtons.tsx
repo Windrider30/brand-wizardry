@@ -14,10 +14,13 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
 
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      await supabase.auth.signOut();
       
-      // Force navigation to login page
+      // Clear any local storage or session storage
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Force a complete page reload to clear all state
       window.location.href = '/login';
       
       toast({
