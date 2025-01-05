@@ -7,19 +7,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const PRICE_IDS = {
-  professional: {
-    yearly: 'price_1QYakPLRjAwduTkvJr89VdyC',
-    quarterly: 'price_1QYajcLRjAwduTkvGHt7Hi2J',
-    monthly: 'price_1QYainLRjAwduTkvLC752ARg'
-  },
-  beginner: {
-    yearly: 'price_1QYahnLRjAwduTkveEalkYJA',
-    quarterly: 'price_1QYagaLRjAwduTkvcgC3Wlmo',
-    monthly: 'price_1QYafILRjAwduTkvPkjXCk7w'
-  }
-};
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -77,18 +64,21 @@ serve(async (req) => {
       );
     }
 
-    if (!PRICE_IDS[tier] || !PRICE_IDS[tier][duration]) {
-      console.error('Invalid tier or duration:', { tier, duration });
+    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
+    console.log('Stripe key exists:', !!stripeKey); // Log if key exists without exposing it
+
+    if (!stripeKey) {
+      console.error('Stripe secret key not found in environment');
       return new Response(
-        JSON.stringify({ error: 'Invalid tier or duration' }),
+        JSON.stringify({ error: 'Stripe configuration error' }),
         { 
-          status: 400,
+          status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       );
     }
 
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+    const stripe = new Stripe(stripeKey, {
       apiVersion: '2023-10-16',
     });
 
