@@ -13,14 +13,20 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Debugging and Authentication State Listener
   useEffect(() => {
+    // Check if Supabase is initialized correctly
+    if (!supabase) {
+      console.error("Supabase client is not initialized.");
+      toast({
+        title: "Configuration Error",
+        description: "Supabase client is not properly configured.",
+        variant: "destructive",
+      });
+    }
+
+    // Log authentication state changes
     const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event, session);
-      if (event === "SIGNED_OUT") {
-        console.log("User has signed out.");
-        // Optionally, update the parent component's state if necessary
-      }
     });
 
     return () => {
@@ -29,68 +35,62 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      console.log("Initiating logout...");
-      
-      // Call Supabase's signOut method
-      const { error } = await supabase.auth.signOut();
-      console.log("Logout response:", error);
+    console.log("Logout button clicked."); // Debugging log
 
+    try {
+      const { error } = await supabase.auth.signOut();
       if (error) {
-        console.error("Supabase signOut error:", error);
+        console.error("Error during sign-out:", error);
         throw error;
       }
 
-      // Clear any stored session data
+      console.log("User successfully signed out.");
       localStorage.clear();
-      console.log("Local storage cleared.");
 
-      // Show success toast
       toast({
         title: "Logged out successfully",
-        description: "You have been logged out of your account",
+        description: "You have been logged out.",
       });
 
       // Redirect to login page
       window.location.href = '/login';
-    } catch (error) {
-      console.error("Logout error:", error);
+    } catch (err) {
+      console.error("Logout error:", err);
 
-      // Show error toast
       toast({
         title: "Error logging out",
-        description: "There was a problem logging out. Please try again.",
+        description: "An issue occurred while logging out. Please try again.",
         variant: "destructive",
       });
     }
   };
 
   const handleLogin = () => {
-    console.log("Navigating to login...");
+    console.log("Login button clicked.");
     navigate('/login');
   };
 
-  if (isAuthenticated) {
-    return (
-      <Button 
-        onClick={handleLogout} 
-        variant="outline" 
-        className="text-lg flex items-center gap-2"
-      >
-        <LogOut className="h-5 w-5" />
-        Logout
-      </Button>
-    );
-  }
-
   return (
-    <Button 
-      onClick={handleLogin} 
-      variant="outline" 
-      className="text-lg flex items-center gap-2"
-    >
-      <LogIn className="h-5 w-5" />
-      Login
-    </Button>
+    <>
+      {isAuthenticated ? (
+        <Button
+          onClick={handleLogout}
+          variant="outline"
+          className="text-lg flex items-center gap-2"
+        >
+          <LogOut className="h-5 w-5" />
+          Logout
+        </Button>
+      ) : (
+        <Button
+          onClick={handleLogin}
+          variant="outline"
+          className="text-lg flex items-center gap-2"
+        >
+          <LogIn className="h-5 w-5" />
+          Login
+        </Button>
+      )}
+    </>
   );
 }
