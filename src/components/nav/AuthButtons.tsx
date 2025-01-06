@@ -27,6 +27,11 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
     // Log authentication state changes
     const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event, session);
+      
+      // If user is signed out, redirect to login
+      if (event === 'SIGNED_OUT') {
+        window.location.href = '/login';
+      }
     });
 
     return () => {
@@ -38,22 +43,25 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
     console.log("Logout button clicked."); // Debugging log
 
     try {
+      // First, clear any stored session data
+      localStorage.clear();
+      sessionStorage.clear();
+
+      // Attempt to sign out
       const { error } = await supabase.auth.signOut();
+      
       if (error) {
         console.error("Error during sign-out:", error);
         throw error;
       }
 
       console.log("User successfully signed out.");
-      localStorage.clear();
 
       toast({
         title: "Logged out successfully",
         description: "You have been logged out.",
       });
 
-      // Redirect to login page
-      window.location.href = '/login';
     } catch (err) {
       console.error("Logout error:", err);
 
