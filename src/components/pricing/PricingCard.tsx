@@ -101,8 +101,9 @@ export function PricingCard({ title, price, features, tier, duration }: PricingC
       </CardContent>
       <CardFooter>
         <Button 
-          className="w-full bg-[#0EA5E9] hover:bg-[#0284C7]" 
+          className="w-full bg-[#0EA5E9] hover:bg-[#0284C7] cursor-pointer" 
           onClick={handleSubscribe}
+          type="button"
         >
           Subscribe Now
         </Button>
