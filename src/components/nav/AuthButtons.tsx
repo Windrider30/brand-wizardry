@@ -15,7 +15,6 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
   const [sessionState, setSessionState] = useState<string>("checking");
 
   useEffect(() => {
-    // Initial session check
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       console.log("Initial session check:", session);
@@ -23,7 +22,6 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
     };
     checkSession();
 
-    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session);
       setSessionState(session ? "authenticated" : "unauthenticated");
@@ -40,39 +38,34 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
   }, [navigate]);
 
   const handleLogout = async () => {
-    console.log("Logout button clicked.");
+    console.log("Logout initiated");
     
     try {
-      // Check session before logout
-      const { data: sessionBefore } = await supabase.auth.getSession();
-      console.log("Session before logout:", sessionBefore);
-
-      // Clear storage first
+      // First, clear any stored session data
+      await supabase.auth.signOut({ scope: 'local' });
+      
+      // Clear browser storage
       localStorage.clear();
       sessionStorage.clear();
-
-      // Attempt to sign out
-      const { error } = await supabase.auth.signOut();
       
-      if (error) {
-        console.error("Error during sign-out:", error);
-        throw error;
+      // Double check session is cleared
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log("Session after logout attempt:", session);
+      
+      if (!session) {
+        console.log("Session successfully cleared");
+        toast({
+          title: "Logged out successfully",
+          description: "You have been logged out.",
+        });
+        
+        // Force navigation to login page
+        navigate('/login', { replace: true });
+      } else {
+        throw new Error("Failed to clear session");
       }
-
-      // Verify session is cleared
-      const { data: sessionAfter } = await supabase.auth.getSession();
-      console.log("Session after logout:", sessionAfter);
-
-      console.log("User successfully signed out.");
-
-      toast({
-        title: "Logged out successfully",
-        description: "You have been logged out.",
-      });
-
     } catch (err) {
       console.error("Logout error:", err);
-
       toast({
         title: "Error logging out",
         description: "An issue occurred while logging out. Please try again.",
@@ -82,7 +75,7 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
   };
 
   const handleLogin = () => {
-    console.log("Login button clicked.");
+    console.log("Login button clicked");
     navigate('/login');
   };
 
