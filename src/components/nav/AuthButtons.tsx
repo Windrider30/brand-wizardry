@@ -54,9 +54,6 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
       localStorage.clear();
       sessionStorage.clear();
       
-      // Force clear any cached auth state
-      await supabase.auth.clearSession();
-      
       // Double check session is cleared
       const { data: { session } } = await supabase.auth.getSession();
       console.log("Session after logout attempt:", session);
