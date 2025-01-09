@@ -41,9 +41,9 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
     console.log("Logout initiated");
     
     try {
-      // First, kill the session on the Supabase side
+      // First, kill all active sessions
       const { error: signOutError } = await supabase.auth.signOut({
-        scope: 'global'  // Changed from 'local' to 'global' to ensure complete signout
+        scope: 'global'
       });
 
       if (signOutError) {
@@ -65,8 +65,8 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
           description: "You have been logged out.",
         });
         
-        // Force navigation to login page with replace to prevent back navigation
-        window.location.href = '/login';  // Using window.location for complete page refresh
+        // Force a complete page refresh to clear any cached state
+        window.location.href = '/login';
       } else {
         throw new Error("Failed to clear session");
       }
