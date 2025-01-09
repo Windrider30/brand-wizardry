@@ -8,6 +8,7 @@ import ProductDescription from "@/pages/ProductDescription";
 import EmailContent from "@/pages/EmailContent";
 import AdGeneration from "@/pages/AdGeneration";
 import SeoArticle from "@/pages/SeoArticle";
+import { Navigate } from "react-router-dom";
 
 export const routes = [
   {
@@ -77,5 +78,9 @@ export const routes = [
         </SubscriptionCheck>
       </ProtectedRoute>
     ),
+  },
+  {
+    path: "*",
+    element: <Navigate to="/login" replace />,
   },
 ];

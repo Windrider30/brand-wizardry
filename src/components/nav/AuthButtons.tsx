@@ -25,11 +25,6 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session);
       setSessionState(session ? "authenticated" : "unauthenticated");
-      
-      if (event === 'SIGNED_OUT') {
-        console.log("User signed out, redirecting to login");
-        window.location.href = '/login';
-      }
     });
 
     return () => {
@@ -41,27 +36,28 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
     console.log("Logout initiated");
     
     try {
-      // First, ensure we kill all active sessions
-      await supabase.auth.signOut({ scope: 'global' });
-      
-      // Clear all browser storage
+      toast({
+        title: "Logging out...",
+        description: "Please wait while we sign you out.",
+      });
+
+      // Clear all browser storage first
       localStorage.clear();
       sessionStorage.clear();
       
-      // Clear any cookies related to authentication
+      // Clear authentication cookies
       document.cookie.split(";").forEach((c) => {
         document.cookie = c
           .replace(/^ +/, "")
           .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
       });
+
+      // Sign out from Supabase (this should be last)
+      await supabase.auth.signOut({ scope: 'global' });
       
-      // Force reload the page to clear any cached state
+      // Redirect to login page after successful logout
       window.location.href = '/login';
       
-      toast({
-        title: "Logged out successfully",
-        description: "You have been logged out.",
-      });
     } catch (err) {
       console.error("Logout error:", err);
       toast({
