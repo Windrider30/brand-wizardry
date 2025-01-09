@@ -22,7 +22,7 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
     };
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event, session);
       setSessionState(session ? "authenticated" : "unauthenticated");
     });
@@ -34,3 +34,45 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
 
   const handleLogout = async () => {
     console.log("Logout initiated");
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Logout error:", error);
+        toast({
+          title: "Error",
+          description: "Failed to log out. Please try again.",
+          status: "error",
+        });
+      } else {
+        toast({
+          title: "Logged out",
+          description: "You have been logged out successfully.",
+          status: "success",
+        });
+        setSessionState("unauthenticated");
+        navigate("/login");
+      }
+    } catch (err) {
+      console.error("Unexpected error during logout:", err);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        status: "error",
+      });
+    }
+  };
+
+  return (
+    <div>
+      {sessionState === "authenticated" ? (
+        <Button onClick={handleLogout} leftIcon={<LogOut />}>
+          Log Out
+        </Button>
+      ) : (
+        <Button onClick={() => navigate("/login")} leftIcon={<LogIn />}>
+          Log In
+        </Button>
+      )}
+    </div>
+  );
+}
