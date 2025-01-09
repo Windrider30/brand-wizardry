@@ -15,6 +15,12 @@ export default defineConfig(({ mode }) => ({
         frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
         connect-src 'self' https://*.stripe.com;
         img-src 'self' data: https://*.stripe.com;
+        font-src 'self' data:;
+        object-src 'none';
+        base-uri 'self';
+        form-action 'self';
+        frame-ancestors 'none';
+        upgrade-insecure-requests;
       `.replace(/\s+/g, ' ').trim()
     }
   },
