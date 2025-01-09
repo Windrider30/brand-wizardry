@@ -28,7 +28,7 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
       
       if (event === 'SIGNED_OUT') {
         console.log("User signed out, redirecting to login");
-        navigate('/login');
+        navigate('/login', { replace: true });
       }
     });
 
@@ -41,12 +41,21 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
     console.log("Logout initiated");
     
     try {
-      // First, clear any stored session data
-      await supabase.auth.signOut({ scope: 'local' });
-      
-      // Clear browser storage
+      // First, kill the session on the Supabase side
+      const { error: signOutError } = await supabase.auth.signOut({
+        scope: 'global'  // Changed from 'local' to 'global' to ensure complete signout
+      });
+
+      if (signOutError) {
+        throw signOutError;
+      }
+
+      // Clear all browser storage
       localStorage.clear();
       sessionStorage.clear();
+      
+      // Force clear any cached auth state
+      await supabase.auth.clearSession();
       
       // Double check session is cleared
       const { data: { session } } = await supabase.auth.getSession();
@@ -59,8 +68,8 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
           description: "You have been logged out.",
         });
         
-        // Force navigation to login page
-        navigate('/login', { replace: true });
+        // Force navigation to login page with replace to prevent back navigation
+        window.location.href = '/login';  // Using window.location for complete page refresh
       } else {
         throw new Error("Failed to clear session");
       }
