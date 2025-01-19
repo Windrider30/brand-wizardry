@@ -5,18 +5,17 @@ import { toast } from "@/components/ui/use-toast";
 export function useAuthState() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [hasSubscription, setHasSubscription] = useState<boolean>(false);
-  const [lastCheck, setLastCheck] = useState<number>(0);
+  const [isChecking, setIsChecking] = useState<boolean>(false);
 
   const checkAuth = useCallback(async () => {
-    // Prevent multiple checks within 2 seconds
-    const now = Date.now();
-    if (now - lastCheck < 2000) {
-      console.log("Skipping auth check - too soon");
+    // Prevent concurrent checks
+    if (isChecking) {
+      console.log("Auth check already in progress");
       return;
     }
-    setLastCheck(now);
 
     try {
+      setIsChecking(true);
       console.log("Checking auth state...");
       const { data: { session }, error } = await supabase.auth.getSession();
       
@@ -53,8 +52,10 @@ export function useAuthState() {
       }
     } catch (err) {
       console.error("Unexpected error during auth check:", err);
+    } finally {
+      setIsChecking(false);
     }
-  }, [lastCheck]);
+  }, [isChecking]);
 
   useEffect(() => {
     // Initial auth check
@@ -66,7 +67,7 @@ export function useAuthState() {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, !!session);
       
-      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
         await checkAuth();
       }
     });
@@ -77,7 +78,7 @@ export function useAuthState() {
       if (document.visibilityState === 'visible') {
         console.log("Tab became visible, scheduling auth check...");
         clearTimeout(timeoutId);
-        timeoutId = setTimeout(checkAuth, 500); // Debounce visibility changes
+        timeoutId = setTimeout(checkAuth, 1000); // Reduced debounce time to 1 second
       }
     };
 
