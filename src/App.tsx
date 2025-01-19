@@ -6,7 +6,14 @@ import { BrowserRouter, Routes, Route, useRoutes } from "react-router-dom";
 import { MainNav } from "./components/MainNav";
 import { routes } from "./routes/routes";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // Prevent refetching when window regains focus
+      retry: false, // Disable automatic retries
+    },
+  },
+});
 
 const AppRoutes = () => {
   const element = useRoutes(routes);
