@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { NavLinks } from "./nav/NavLinks";
 import { AuthButtons } from "./nav/AuthButtons";
 import { SupportButton } from "./nav/SupportButton";
+import { toast } from "@/components/ui/use-toast";
 
 export function MainNav() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -12,26 +13,52 @@ export function MainNav() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
+      try {
+        console.log("Checking auth state...");
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Auth check error:", error);
+          toast({
+            title: "Authentication Error",
+            description: "There was an error checking your authentication status. Please try logging in again.",
+            variant: "destructive",
+          });
+          return;
+        }
 
-      if (session) {
-        const { data: subscription } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .eq('status', 'active')
-          .maybeSingle();
+        console.log("Session state:", !!session);
+        setIsAuthenticated(!!session);
 
-        setHasSubscription(!!subscription);
+        if (session) {
+          const { data: subscription, error: subError } = await supabase
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .eq('status', 'active')
+            .maybeSingle();
+
+          if (subError) {
+            console.error("Subscription check error:", subError);
+            return;
+          }
+
+          console.log("Subscription state:", !!subscription);
+          setHasSubscription(!!subscription);
+        }
+      } catch (err) {
+        console.error("Unexpected error during auth check:", err);
       }
     };
 
+    // Check immediately on component mount
     checkAuth();
 
+    // Set up auth state listener
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, !!session);
       setIsAuthenticated(!!session);
       
       if (session) {
@@ -48,7 +75,21 @@ export function MainNav() {
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Add visibility change listener
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log("Tab became visible, rechecking auth...");
+        checkAuth();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup
+    return () => {
+      subscription.unsubscribe();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   return (
