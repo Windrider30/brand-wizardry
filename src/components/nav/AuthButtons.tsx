@@ -36,29 +36,13 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
   }, []);
 
   const handleLogout = async () => {
-    console.log("Logout initiated");
-    
     try {
       toast({
         title: "Logging out...",
         description: "Please wait while we sign you out.",
       });
 
-      // Clear all browser storage first
-      localStorage.clear();
-      sessionStorage.clear();
-      
-      // Clear authentication cookies
-      document.cookie.split(";").forEach((c) => {
-        document.cookie = c
-          .replace(/^ +/, "")
-          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-      });
-
-      // Sign out from Supabase (this should be last)
-      await supabase.auth.signOut({ scope: 'global' });
-      
-      // Use navigate instead of direct window.location manipulation
+      await supabase.auth.signOut();
       navigate('/login');
       
     } catch (err) {
@@ -71,8 +55,7 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
     }
   };
 
-  const handleLogin = async () => {
-    console.log("Login button clicked");
+  const handleLogin = () => {
     navigate('/login');
   };
 

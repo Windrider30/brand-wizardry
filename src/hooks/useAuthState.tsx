@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/use-toast";
 
 export function useAuthState() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -9,7 +8,6 @@ export function useAuthState() {
   const [lastCheckTime, setLastCheckTime] = useState<number>(0);
 
   const checkAuth = useCallback(async () => {
-    // Prevent checks more frequent than every 5 seconds
     const now = Date.now();
     if (isChecking || (now - lastCheckTime < 5000)) {
       return;
@@ -22,14 +20,12 @@ export function useAuthState() {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
-        setIsAuthenticated(false);
-        setHasSubscription(false);
+        console.error("Session check error:", sessionError);
         return;
       }
 
-      setIsAuthenticated(!!session);
-
-      if (session) {
+      if (session?.user) {
+        setIsAuthenticated(true);
         try {
           const { data: subscription, error: subError } = await supabase
             .from('subscriptions')
@@ -40,59 +36,41 @@ export function useAuthState() {
 
           if (subError) {
             console.error("Subscription check error:", subError);
-            // Don't update subscription state on error to prevent flashing
             return;
           }
 
           setHasSubscription(!!subscription);
         } catch (err) {
-          console.error("Unexpected error during subscription check:", err);
-          // Don't update subscription state on error
+          console.error("Subscription check error:", err);
         }
       } else {
+        setIsAuthenticated(false);
         setHasSubscription(false);
       }
     } catch (err) {
-      console.error("Unexpected error during auth check:", err);
-      setIsAuthenticated(false);
-      setHasSubscription(false);
+      console.error("Auth check error:", err);
     } finally {
       setIsChecking(false);
     }
   }, [lastCheckTime, isChecking]);
 
   useEffect(() => {
-    // Initial auth check
     checkAuth();
 
-    // Set up auth state listener
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-        await checkAuth();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        setIsAuthenticated(true);
+        checkAuth();
+      } else if (event === 'SIGNED_OUT') {
+        setIsAuthenticated(false);
+        setHasSubscription(false);
       }
     });
 
-    // Only check auth on visibility change if we're not sure about the auth state
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        // Preserve the current auth state when tabbing back
-        // Only check if we're really unsure about the auth state
-        if (isAuthenticated === null) {
-          checkAuth();
-        }
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Cleanup
     return () => {
       subscription.unsubscribe();
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [checkAuth, isAuthenticated]);
+  }, [checkAuth]);
 
   return { isAuthenticated, hasSubscription };
 }
