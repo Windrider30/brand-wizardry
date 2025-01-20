@@ -55,7 +55,10 @@ export function useAuthState() {
   }, [lastCheckTime, isChecking]);
 
   useEffect(() => {
-    checkAuth();
+    // Only do initial auth check if we don't know the auth state
+    if (isAuthenticated === null) {
+      checkAuth();
+    }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN') {
@@ -67,10 +70,24 @@ export function useAuthState() {
       }
     });
 
+    // Handle tab/window visibility changes
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        // Only check auth if we're not sure about the current state
+        // This prevents unnecessary reloads/redirects
+        if (isAuthenticated === null) {
+          checkAuth();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       subscription.unsubscribe();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [checkAuth]);
+  }, [checkAuth, isAuthenticated]);
 
   return { isAuthenticated, hasSubscription };
 }
