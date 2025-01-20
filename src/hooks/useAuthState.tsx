@@ -6,51 +6,60 @@ export function useAuthState() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [hasSubscription, setHasSubscription] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(false);
+  const [lastCheckTime, setLastCheckTime] = useState<number>(0);
 
   const checkAuth = useCallback(async () => {
-    if (isChecking) {
+    // Prevent checks more frequent than every 5 seconds
+    const now = Date.now();
+    if (isChecking || (now - lastCheckTime < 5000)) {
       return;
     }
 
     try {
       setIsChecking(true);
-      const { data: { session }, error } = await supabase.auth.getSession();
+      setLastCheckTime(now);
       
-      if (error) {
-        console.error("Auth check error:", error);
-        toast({
-          title: "Authentication Error",
-          description: "There was an error checking your authentication status. Please try logging in again.",
-          variant: "destructive",
-        });
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        setIsAuthenticated(false);
+        setHasSubscription(false);
         return;
       }
 
       setIsAuthenticated(!!session);
 
       if (session) {
-        const { data: subscription, error: subError } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .eq('status', 'active')
-          .maybeSingle();
+        try {
+          const { data: subscription, error: subError } = await supabase
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .eq('status', 'active')
+            .maybeSingle();
 
-        if (subError) {
-          console.error("Subscription check error:", subError);
-          return;
+          if (subError) {
+            console.error("Subscription check error:", subError);
+            // Don't update subscription state on error to prevent flashing
+            return;
+          }
+
+          setHasSubscription(!!subscription);
+        } catch (err) {
+          console.error("Unexpected error during subscription check:", err);
+          // Don't update subscription state on error
         }
-
-        setHasSubscription(!!subscription);
       } else {
         setHasSubscription(false);
       }
     } catch (err) {
       console.error("Unexpected error during auth check:", err);
+      setIsAuthenticated(false);
+      setHasSubscription(false);
     } finally {
       setIsChecking(false);
     }
-  }, []);
+  }, [lastCheckTime]);
 
   useEffect(() => {
     // Initial auth check
@@ -65,17 +74,13 @@ export function useAuthState() {
       }
     });
 
-    // Add visibility change listener with debounce
-    let timeoutId: NodeJS.Timeout;
+    // Add visibility change listener with rate limiting
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && !isChecking) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          // Only check if the state is uncertain
-          if (isAuthenticated === null) {
-            checkAuth();
-          }
-        }, 1000);
+        // Only check if the state is uncertain
+        if (isAuthenticated === null) {
+          checkAuth();
+        }
       }
     };
 
@@ -85,7 +90,6 @@ export function useAuthState() {
     return () => {
       subscription.unsubscribe();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      clearTimeout(timeoutId);
     };
   }, [checkAuth, isChecking, isAuthenticated]);
 
