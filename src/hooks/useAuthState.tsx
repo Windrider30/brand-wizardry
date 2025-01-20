@@ -59,7 +59,7 @@ export function useAuthState() {
     } finally {
       setIsChecking(false);
     }
-  }, [lastCheckTime]);
+  }, [lastCheckTime, isChecking]);
 
   useEffect(() => {
     // Initial auth check
@@ -74,10 +74,11 @@ export function useAuthState() {
       }
     });
 
-    // Add visibility change listener with rate limiting
+    // Only check auth on visibility change if we're not sure about the auth state
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && !isChecking) {
-        // Only check if the state is uncertain
+      if (document.visibilityState === 'visible') {
+        // Preserve the current auth state when tabbing back
+        // Only check if we're really unsure about the auth state
         if (isAuthenticated === null) {
           checkAuth();
         }
@@ -91,7 +92,7 @@ export function useAuthState() {
       subscription.unsubscribe();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [checkAuth, isChecking, isAuthenticated]);
+  }, [checkAuth, isAuthenticated]);
 
   return { isAuthenticated, hasSubscription };
 }
