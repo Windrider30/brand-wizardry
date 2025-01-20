@@ -8,15 +8,12 @@ export function useAuthState() {
   const [isChecking, setIsChecking] = useState<boolean>(false);
 
   const checkAuth = useCallback(async () => {
-    // Prevent concurrent checks
     if (isChecking) {
-      console.log("Auth check already in progress");
       return;
     }
 
     try {
       setIsChecking(true);
-      console.log("Checking auth state...");
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (error) {
@@ -29,7 +26,6 @@ export function useAuthState() {
         return;
       }
 
-      console.log("Session state:", !!session);
       setIsAuthenticated(!!session);
 
       if (session) {
@@ -45,7 +41,6 @@ export function useAuthState() {
           return;
         }
 
-        console.log("Subscription state:", !!subscription);
         setHasSubscription(!!subscription);
       } else {
         setHasSubscription(false);
@@ -55,7 +50,7 @@ export function useAuthState() {
     } finally {
       setIsChecking(false);
     }
-  }, [isChecking]);
+  }, []);
 
   useEffect(() => {
     // Initial auth check
@@ -65,9 +60,7 @@ export function useAuthState() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, !!session);
-      
-      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
         await checkAuth();
       }
     });
@@ -75,10 +68,14 @@ export function useAuthState() {
     // Add visibility change listener with debounce
     let timeoutId: NodeJS.Timeout;
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        console.log("Tab became visible, scheduling auth check...");
+      if (document.visibilityState === 'visible' && !isChecking) {
         clearTimeout(timeoutId);
-        timeoutId = setTimeout(checkAuth, 1000); // Reduced debounce time to 1 second
+        timeoutId = setTimeout(() => {
+          // Only check if the state is uncertain
+          if (isAuthenticated === null) {
+            checkAuth();
+          }
+        }, 1000);
       }
     };
 
@@ -90,7 +87,7 @@ export function useAuthState() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       clearTimeout(timeoutId);
     };
-  }, [checkAuth]);
+  }, [checkAuth, isChecking, isAuthenticated]);
 
   return { isAuthenticated, hasSubscription };
 }
