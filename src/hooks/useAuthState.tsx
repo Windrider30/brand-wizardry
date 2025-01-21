@@ -70,22 +70,8 @@ export function useAuthState() {
       }
     });
 
-    // Handle tab/window visibility changes
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        // Only check auth if we're not sure about the current state
-        // This prevents unnecessary reloads/redirects
-        if (isAuthenticated === null) {
-          checkAuth();
-        }
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
     return () => {
       subscription.unsubscribe();
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [checkAuth, isAuthenticated]);
 
